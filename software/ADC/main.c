@@ -20,6 +20,7 @@
 #include "main.h"
 #include "stm32f4xx.h" 
 #include <stdint.h>
+#include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -66,6 +67,23 @@ void delay (volatile uint32_t time)
      for (volatile uint32_t j=0 ; j<1000 ; j++);
    }
  }
+
+ /* UART  */
+
+void UART_SendChar(char c)
+{
+    while(!(USART2->SR & (1 << 7)));   // TXE warten
+
+    USART2->DR = c;
+}
+
+void UART_SendString(char *str)
+{
+    while(*str)
+    {
+        UART_SendChar(*str++);
+    }
+}
 
 /* USER CODE END 0 */
 
@@ -136,17 +154,25 @@ ADC1->SQR3 = 0;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint16_t adc_value;
+  char buffer[50];
   while (1)
   {
     /* USER CODE END WHILE */
   /* ADC Wandlung starten */
 ADC1->CR2 |= (1 << 30);
 
-/* Warten bis fertig */
+/* Warten bis fertig (Auf EOC warten) */
 while(!(ADC1->SR & (1 << 1)));
 
 /* ADC Wert lesen */
 adc_value = ADC1->DR;
+
+/* UART Ausgabe */
+sprintf(buffer, "ADC Value = %u\r\n", adc_value);
+
+UART_SendString(buffer);
+
+/* LEDs löschen */
 GPIOA->ODR &= ~(0xF0);
 
 if(adc_value > 500)
@@ -169,7 +195,7 @@ if(adc_value > 3500)
     GPIOA->BSRR = (1 << 7);
 }
 
-delay(100);
+delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
