@@ -147,6 +147,27 @@ while(!(ADC1->SR & (1 << 1)));
 
 /* ADC Wert lesen */
 adc_value = ADC1->DR;
+GPIOA->ODR &= ~(0xF0);
+
+if(adc_value > 500)
+{
+    GPIOA->BSRR = (1 << 4);
+}
+
+if(adc_value > 1500)
+{
+    GPIOA->BSRR = (1 << 5);
+}
+
+if(adc_value > 2500)
+{
+    GPIOA->BSRR = (1 << 6);
+}
+
+if(adc_value > 3500)
+{
+    GPIOA->BSRR = (1 << 7);
+}
 
 delay(100);
     /* USER CODE BEGIN 3 */
