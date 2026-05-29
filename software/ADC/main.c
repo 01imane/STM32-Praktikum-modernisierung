@@ -62,7 +62,7 @@ static void MX_USART2_UART_Init(void);
 /*warte Zeit zum Zeigen*/
 void delay (volatile uint32_t time)
  {
-   for (volatile uint32_t i=0 ; i<time ; i++);
+   for (volatile uint32_t i=0 ; i<time ; i++)
    {  
      for (volatile uint32_t j=0 ; j<1000 ; j++);
    }
@@ -82,6 +82,29 @@ void UART_SendString(char *str)
     while(*str)
     {
         UART_SendChar(*str++);
+    }
+}
+void DAC_SquareWave(void)
+{
+    DAC->DHR12R1 = 4095;
+
+    delay(500);
+
+    DAC->DHR12R1 = 0;
+
+    delay(500);
+}
+void DAC_FixedVoltage(void)
+{
+    DAC->DHR12R1 = 2048;
+}
+void DAC_Sägezahn(void)
+{
+    for(int i = 0; i < 4095; i += 20)
+    {
+        DAC->DHR12R1 = i;
+
+        delay(1);
     }
 }
 
@@ -138,6 +161,7 @@ GPIOA->MODER |= (3 << (4 * 2));
    DAC Kanal 1 aktivieren
 ---------------------------------------- */
 DAC->CR |= (1 << 0);
+UART_SendString("Square Wave\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -146,13 +170,8 @@ DAC->CR |= (1 << 0);
   while (1)
   {
     /* USER CODE END WHILE */
-  /* DAC Wert setzen ca 1,65 V */
-DAC->DHR12R1 = 2048;
-
-/* Ausgabe über UART */
-UART_SendString("DAC Output = 1.65V\r\n");
-
-delay(1000);
+    
+    DAC_SquareWave();
 
     /* USER CODE BEGIN 3 */
   }
