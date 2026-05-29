@@ -62,7 +62,7 @@ static void MX_USART2_UART_Init(void);
 /*warte Zeit zum Zeigen*/
 void delay (volatile uint32_t time)
  {
-   for (volatile uint32_t i=0 ; i<time ; i++);
+   for (volatile uint32_t i=0 ; i<time ; i++)
    {  
      for (volatile uint32_t j=0 ; j<1000 ; j++);
    }
@@ -82,6 +82,51 @@ void UART_SendString(char *str)
     while(*str)
     {
         UART_SendChar(*str++);
+    }
+}
+
+char UART_ReadChar(void)
+{
+    while(!(USART2->SR & (1 << 5)));   // RXNE warten
+
+    return USART2->DR;
+}
+
+void DAC_SquareWave(void)
+{
+    DAC->DHR12R1 = 4095;
+
+    delay(500);
+
+    DAC->DHR12R1 = 0;
+
+    delay(500);
+}
+void DAC_FixedVoltage(void)
+{
+    DAC->DHR12R1 = 2048;
+}
+void DAC_Sägezahn(void)
+{
+    for(int i = 0; i < 4095; i += 20)
+    {
+        DAC->DHR12R1 = i;
+
+        delay(1);
+    }
+}
+void DAC_TriangleWave(void)
+{
+    for(int i = 0; i < 4095; i += 20)
+    {
+        DAC->DHR12R1 = i;
+        delay(1);
+    }
+
+    for(int i = 4095; i > 0; i -= 20)
+    {
+        DAC->DHR12R1 = i;
+        delay(1);
     }
 }
 
@@ -124,78 +169,84 @@ int main(void)
 RCC->AHB1ENR |= (1 << 0);
 
 /* ----------------------------------------
-   ADC1 Clock aktivieren
+   DAC Clock aktivieren
 ---------------------------------------- */
-RCC->APB2ENR |= (1 << 8);
+RCC->APB1ENR |= (1 << 29);
 
 /* ----------------------------------------
-   PA0 als Analog Eingang
+   PA4 als Analog Mode
+   DAC_OUT1 = PA4
 ---------------------------------------- */
-GPIOA->MODER |= (3 << (0 * 2));
+GPIOA->MODER |= (3 << (4 * 2));
 
 /* ----------------------------------------
-   PA4 - PA7 als Output
+   DAC Kanal 1 aktivieren
 ---------------------------------------- */
-for(int i = 4; i < 8; i++)
-{
-    GPIOA->MODER &= ~(3 << (i * 2));
-    GPIOA->MODER |=  (1 << (i * 2));
-}
+DAC->CR |= (1 << 0);
 
-/* ----------------------------------------
-   ADC einschalten
----------------------------------------- */
-ADC1->CR2 |= (1 << 0);
+UART_SendString("\r\n");
+UART_SendString("===== DAC SIGNAL GENERATOR =====\r\n");
+UART_SendString("1 = Fixed Voltage\r\n");
+UART_SendString("2 = Square Wave\r\n");
+UART_SendString("3 = Sawtooth Wave\r\n");
+UART_SendString("4 = Triangle Wave\r\n");
+UART_SendString("Select Mode: \r\n");
 
-/* Kanal 0 auswählen (PA0) */
-ADC1->SQR3 = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint16_t adc_value;
-  char buffer[50];
+  char choice;
   while (1)
   {
     /* USER CODE END WHILE */
-  /* ADC Wandlung starten */
-ADC1->CR2 |= (1 << 30);
-
-/* Warten bis fertig (Auf EOC warten) */
-while(!(ADC1->SR & (1 << 1)));
-
-/* ADC Wert lesen */
-adc_value = ADC1->DR;
-
-/* UART Ausgabe */
-sprintf(buffer, "ADC Value = %u\r\n", adc_value);
-
-UART_SendString(buffer);
-
-/* LEDs löschen */
-GPIOA->ODR &= ~(0xF0);
-
-if(adc_value > 500)
+    
+    while(1)
 {
-    GPIOA->BSRR = (1 << 4);
+    choice = UART_ReadChar();
+
+    switch(choice)
+    {
+        case '1':
+
+            UART_SendString("\r\nFixed Voltage\r\n");
+
+            DAC_FixedVoltage();
+
+            break;
+
+        case '2':
+
+            UART_SendString("\r\nSquare Wave\r\n");
+
+            DAC_SquareWave();
+
+            break;
+
+        case '3':
+
+            UART_SendString("\r\nSawtooth Wave\r\n");
+
+            DAC_SawtoothWave();
+
+            break;
+
+        case '4':
+
+            UART_SendString("\r\nTriangle Wave\r\n");
+
+            DAC_TriangleWave();
+
+            break;
+
+        default:
+
+            UART_SendString("\r\nInvalid Selection\r\n");
+
+            break;
+    }
 }
 
-if(adc_value > 1500)
-{
-    GPIOA->BSRR = (1 << 5);
-}
-
-if(adc_value > 2500)
-{
-    GPIOA->BSRR = (1 << 6);
-}
-
-if(adc_value > 3500)
-{
-    GPIOA->BSRR = (1 << 7);
-}
-
-delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
