@@ -124,78 +124,36 @@ int main(void)
 RCC->AHB1ENR |= (1 << 0);
 
 /* ----------------------------------------
-   ADC1 Clock aktivieren
+   DAC Clock aktivieren
 ---------------------------------------- */
-RCC->APB2ENR |= (1 << 8);
+RCC->APB1ENR |= (1 << 29);
 
 /* ----------------------------------------
-   PA0 als Analog Eingang
+   PA4 als Analog Mode
+   DAC_OUT1 = PA4
 ---------------------------------------- */
-GPIOA->MODER |= (3 << (0 * 2));
+GPIOA->MODER |= (3 << (4 * 2));
 
 /* ----------------------------------------
-   PA4 - PA7 als Output
+   DAC Kanal 1 aktivieren
 ---------------------------------------- */
-for(int i = 4; i < 8; i++)
-{
-    GPIOA->MODER &= ~(3 << (i * 2));
-    GPIOA->MODER |=  (1 << (i * 2));
-}
-
-/* ----------------------------------------
-   ADC einschalten
----------------------------------------- */
-ADC1->CR2 |= (1 << 0);
-
-/* Kanal 0 auswählen (PA0) */
-ADC1->SQR3 = 0;
+DAC->CR |= (1 << 0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint16_t adc_value;
-  char buffer[50];
+  
   while (1)
   {
     /* USER CODE END WHILE */
-  /* ADC Wandlung starten */
-ADC1->CR2 |= (1 << 30);
+  /* DAC Wert setzen ca 1,65 V */
+DAC->DHR12R1 = 2048;
 
-/* Warten bis fertig (Auf EOC warten) */
-while(!(ADC1->SR & (1 << 1)));
-
-/* ADC Wert lesen */
-adc_value = ADC1->DR;
-
-/* UART Ausgabe */
-sprintf(buffer, "ADC Value = %u\r\n", adc_value);
-
-UART_SendString(buffer);
-
-/* LEDs löschen */
-GPIOA->ODR &= ~(0xF0);
-
-if(adc_value > 500)
-{
-    GPIOA->BSRR = (1 << 4);
-}
-
-if(adc_value > 1500)
-{
-    GPIOA->BSRR = (1 << 5);
-}
-
-if(adc_value > 2500)
-{
-    GPIOA->BSRR = (1 << 6);
-}
-
-if(adc_value > 3500)
-{
-    GPIOA->BSRR = (1 << 7);
-}
+/* Ausgabe über UART */
+UART_SendString("DAC Output = 1.65V\r\n");
 
 delay(1000);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
