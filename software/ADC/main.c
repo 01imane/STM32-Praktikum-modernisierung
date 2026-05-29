@@ -107,6 +107,20 @@ void DAC_Sägezahn(void)
         delay(1);
     }
 }
+void DAC_TriangleWave(void)
+{
+    for(int i = 0; i < 4095; i += 20)
+    {
+        DAC->DHR12R1 = i;
+        delay(1);
+    }
+
+    for(int i = 4095; i > 0; i -= 20)
+    {
+        DAC->DHR12R1 = i;
+        delay(1);
+    }
+}
 
 /* USER CODE END 0 */
 
