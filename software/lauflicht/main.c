@@ -58,14 +58,6 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/*warte Zeit zum Zeigen*/
-void delay (volatile uint32_t time)
- {
-   for (volatile uint32_t i=0 ; i<time ; i++);
-   {  
-     for (volatile uint32_t j=0 ; j<1000 ; j++);
-   }
- }
 
 /* USER CODE END 0 */
 
@@ -100,36 +92,46 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-/* GPIOA Clock aktivieren */
-RCC->AHB1ENR |= (1 << 0);
+// Clock aktivieren für timer und PC
+RCC->AHB1ENR |= (1 << 2); // GPIOC
+RCC->APB1ENR |= (1 << 0); // TIM2
 
-/* PA0 - PA7 als Output konfigurieren */
 
-/* Erst löschen */
-GPIOA->MODER &= ~(0x0000FFFF);
+// PC0–PC7 als Output konfigurieren
+GPIOC->MODER &= ~(0xFFFF);        // reset PC0–PC7 also 8 pins (16 bits)
+GPIOC->MODER |=  (0x5555);        // 01 01 01 01 01 01 01 01  ist  Output
 
-/* Output setzen */
-for(int i = 0; i < 8; i++)
-{
-    GPIOA->MODER |= (1 << (i * 2));
-}
+// Timer konfigurieren
+TIM2->PSC = 16000 - 1;   // Prescaler
+TIM2->ARR = 1000 - 1;    // für Auto reload
+
+TIM2->CR1 |= (1 << 0);   // Timer starten // PC0 output// Pull-up
   /* USER CODE END 2 */
-
+uint8_t pos = 0;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-    for(int i = 0; i < 8; i++)
-{
-    /* Alle LEDs aus */
-    GPIOA->ODR = 0x00;
+   
 
-    /* LEDs nach einander an */
-    GPIOA->ODR |= (1 << i);
+    if (TIM2->SR & 1)   // warten bis Timer fertig
+    {
+        TIM2->SR &= ~1; // Flag löschen
 
-    delay(300);
-}
+        // alle LEDs aus
+        GPIOC->ODR &= ~(0xFF);
+
+        // aktuelle LED an mit ein pos zähler
+        GPIOC->ODR |= (1 << pos);
+
+        // nächste Position hoch gehen
+        pos++;
+
+        if (pos > 7)
+            pos = 0; // zum Anfangsposition
+    }
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
