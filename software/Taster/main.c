@@ -58,14 +58,6 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/*warte Zeit zum Zeigen*/
-void delay (volatile uint32_t time)
- {
-   for (volatile uint32_t i=0 ; i<time ; i++);
-   {  
-     for (volatile uint32_t j=0 ; j<1000 ; j++);
-   }
- }
 
 /* USER CODE END 0 */
 
@@ -100,89 +92,49 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-/* ----------------------------------------
-   GPIOA Clock aktivieren
----------------------------------------- */
+// Clock aktivieren für PC
+RCC->AHB1ENR |= (1 << 2); // GPIOC
 
-RCC->AHB1ENR |= (1 << 0);
 
-/* ----------------------------------------
-   PA0 - PA3 als Input konfigurieren
----------------------------------------- */
 
-for(int i = 0; i < 4; i++)
-{
-    /* Input Mode */
-    GPIOA->MODER &= ~(3 << (i * 2));
+// PC0–PC7 als Output konfigurieren
+GPIOC->MODER &= ~(0xFFFF);        // reset PC0–PC7 also 8 pins (16 bits)
+GPIOC->MODER |=  (0x5555);        // 01 01 01 01 01 01 01 01  ist  Output
 
-    /* Pull-Up aktivieren */
-    GPIOA->PUPDR &= ~(3 << (i * 2));
+GPIOC->MODER &= ~(3 << (13 * 2)); // B1 Button (PC13) → Input zum Leds Steuern
 
-    GPIOA->PUPDR |= (1 << (i * 2));
-}
 
-/* ----------------------------------------
-   PA4 - PA7 als Output konfigurieren
----------------------------------------- */
 
-for(int i = 4; i < 8; i++)
-{
-    /* Mode Bits löschen */
-    GPIOA->MODER &= ~(3 << (i * 2));
 
-    /* Output setzen */
-    GPIOA->MODER |= (1 << (i * 2));
-}
   /* USER CODE END 2 */
-
+uint8_t pos = 0;
+uint8_t last_state = 1;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-   /* ----------------------------------------
-   Alle LEDs ausschalten
----------------------------------------- */
+   
+     uint8_t current = (GPIOC->IDR & (1 << 13)) ? 1 : 0;
+     // Flanke: HIGH → LOW (Button gedrückt)
+    if (last_state == 1 && current == 0)
+    {
+        // alle LEDs aus
+        GPIOC->ODR &= ~(0xFF);
 
-GPIOA->ODR &= ~(0xF0);
+        // LED setzen
+        GPIOC->ODR |= (1 << pos);
 
-/* ----------------------------------------
-   Taster PA0 -> LED PA4
----------------------------------------- */
+        pos++;
+        if (pos > 7) pos = 0;
+    }
 
-if(!(GPIOA->IDR & (1 << 0)))
-{
-    GPIOA->BSRR = (1 << 4);
-}
+    last_state = current;
 
-/* ----------------------------------------
-   Taster PA1 -> LED PA5
----------------------------------------- */
 
-if(!(GPIOA->IDR & (1 << 1)))
-{
-    GPIOA->BSRR = (1 << 5);
-}
+    
+    
 
-/* ----------------------------------------
-   Taster PA2 -> LED PA6
----------------------------------------- */
-
-if(!(GPIOA->IDR & (1 << 2)))
-{
-    GPIOA->BSRR = (1 << 6);
-}
-
-/* ----------------------------------------
-   Taster PA3 -> LED PA7
----------------------------------------- */
-
-if(!(GPIOA->IDR & (1 << 3)))
-{
-    GPIOA->BSRR = (1 << 7);
-}
-
-delay(100);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

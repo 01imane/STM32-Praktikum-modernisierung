@@ -98,10 +98,14 @@ RCC->APB1ENR |= (1 << 0); // TIM2
 
 
 // PC0–PC7 als Output konfigurieren
+// @satisfies MP1_LED_Lauflicht_2
+// @satisfies MP1_LED_Lauflicht_7
 GPIOC->MODER &= ~(0xFFFF);        // reset PC0–PC7 also 8 pins (16 bits)
 GPIOC->MODER |=  (0x5555);        // 01 01 01 01 01 01 01 01  ist  Output
 
 // Timer konfigurieren
+// @satisfies MP1_LED_Lauflicht_6
+// @satisfies MP1_LED_Lauflicht_5
 TIM2->PSC = 16000 - 1;   // Prescaler
 TIM2->ARR = 1000 - 1;    // für Auto reload
 
@@ -118,7 +122,9 @@ uint8_t pos = 0;
     if (TIM2->SR & 1)   // warten bis Timer fertig
     {
         TIM2->SR &= ~1; // Flag löschen
-
+        // @satisfies MP1_LED_Lauflicht_1
+        // @satisfies MP1_LED_Lauflicht_3
+        // @satisfies MP1_LED_Lauflicht_4
         // alle LEDs aus
         GPIOC->ODR &= ~(0xFF);
 
