@@ -124,7 +124,7 @@ uint8_t pos = 0;
         TIM2->SR &= ~1; // Flag löschen
         // @satisfies MP1_LED_Lauflicht_1
         // @satisfies MP1_LED_Lauflicht_3
-        // @satisfies MP1_LED_Lauflicht_4
+        // MP1_LED_Lauflicht_4
         // alle LEDs aus
         GPIOC->ODR &= ~(0xFF);
 
