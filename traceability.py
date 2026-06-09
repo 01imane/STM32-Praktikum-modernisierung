@@ -118,7 +118,7 @@ def generate_markdown_report(requirements, output_file="requirements_report.md")
 
         for req_id, data in sorted(requirements.items()):
             status = data["status"]
-            impl = "  ok  " if data["implemented"] else "NO"
+            impl = "ok" if data["implemented"] else "NO"
             file = data["file"]
 
             md.write(f"| {req_id} | {status} | {impl} | {file} |\n")
