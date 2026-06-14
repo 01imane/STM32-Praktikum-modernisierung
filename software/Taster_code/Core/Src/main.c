@@ -97,38 +97,88 @@ RCC->AHB1ENR |= (1 << 0); // GPIOA
 RCC->AHB1ENR |= (1 << 2); // GPIOC
 
 // ----------------------
-// LED (z.B. PC0)
+// LED ( PC0)
 // ----------------------
-GPIOC->MODER &= ~(3 << (0 * 2)); // reset
-GPIOC->MODER |=  (1 << (0 * 2)); // output
+// @satisfies GPIO_CONFIG
+// ----------------------
+GPIOC->MODER &= ~(0xFF);   // reset PC0–PC3
+GPIOC->MODER |=  (0x55);   // output
 
 // ----------------------
-// Taster PA11 als Input
+// Taster PA11–PA14 Input
 // ----------------------
-GPIOA->MODER &= ~(3 << (11 * 2)); // input
+GPIOA->MODER &= ~(0xFF << 22); // reset PA11–PA14
 
-// Pull-Up aktivieren
-GPIOA->PUPDR &= ~(3 << (11 * 2));
-GPIOA->PUPDR |=  (1 << (11 * 2)); // pull-up
+// Pull-Up für alle
+GPIOA->PUPDR &= ~(0xFF << 22);
+GPIOA->PUPDR |=  (0x55 << 22); // Pull-Up
   /* USER CODE END 2 */
 
   /* Infinite loop */
+uint32_t counter = 0;
+uint8_t state = 0;
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
    
-     if (!(GPIOA->IDR & (1 << 11))) // gedrückt
-    {
-        GPIOC->ODR |= (1 << 0); // LED an
-    }
-    else
-    {
-        GPIOC->ODR &= ~(1 << 0); // LED aus
-    }
-    
-    
+   // einfacher Delay (~1ms je nach Takt anpassen!)
+    for (volatile int i = 0; i < 16000; i++);
 
+    counter++;
+
+    // ----------------------
+    // Taster prüfen
+    // ----------------------
+  // @satisfies TASTER_LOGIC
+    if (!(GPIOA->IDR & (1 << 11)))
+        state = 1;
+
+    else if (!(GPIOA->IDR & (1 << 12)))
+        state = 2;
+
+    else if (!(GPIOA->IDR & (1 << 13)))
+        state = 3;
+
+    else if (!(GPIOA->IDR & (1 << 14)))
+        state = 4;
+
+    // ----------------------
+    // Verhalten
+    // ----------------------
+    
+    // @satisfies TASTER_1 
+
+    // T1 → LED1 blinkt 1 Hz
+    if (state == 1)
+    {
+        if (counter % 1000 == 0) // ~1s
+            GPIOC->ODR ^= (1 << 0);
+    }
+    
+    // @satisfies TASTER_2
+
+    // T2 → LED2 blinkt langsamer (~2s)
+    else if (state == 2)
+    {
+        if (counter % 2000 == 0)
+            GPIOC->ODR ^= (1 << 1);
+    }
+    
+    // @satisfies TASTER_3
+
+    // T3 → alle blinken
+    else if (state == 3)
+    {
+        if (counter % 1000 == 0)
+            GPIOC->ODR ^= 0x0F; // PC0–PC3 toggeln
+    }
+    // @satisfies TASTER_4
+    // T4 → alle an
+    else if (state == 4)
+    {
+        GPIOC->ODR |= 0x0F;
+    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
