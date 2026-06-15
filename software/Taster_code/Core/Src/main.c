@@ -20,6 +20,7 @@
 #include "main.h"
 #include "stm32f4xx.h" 
 #include <stdint.h>
+#include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -58,7 +59,11 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int __io_putchar(int ch)
+{
+    HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
 /* USER CODE END 0 */
 
 /**
@@ -92,49 +97,131 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-// Clock aktivieren für PC
+// Clock aktivieren
+RCC->AHB1ENR |= (1 << 0); // GPIOA
 RCC->AHB1ENR |= (1 << 2); // GPIOC
 
+// ----------------------
+// LED ( PC0)
+// ----------------------
 
+// ----------------------
+GPIOC->MODER &= ~(0xFF);   // reset PC0–PC3
+// @satisfies GPIO_CONFIG
+GPIOC->MODER |=  (0x55);   // output
 
-// PC0–PC7 als Output konfigurieren
-GPIOC->MODER &= ~(0xFFFF);        // reset PC0–PC7 also 8 pins (16 bits)
-GPIOC->MODER |=  (0x5555);        // 01 01 01 01 01 01 01 01  ist  Output
+// ----------------------
+// Taster PA11–PA14 Input
+// ----------------------
+GPIOA->MODER &= ~(0xFF << 22); // reset PA11–PA14
 
-GPIOC->MODER &= ~(3 << (13 * 2)); // B1 Button (PC13) → Input zum Leds Steuern
-
-
-
-
+// Pull-Up für alle
+GPIOA->PUPDR &= ~(0xFF << 22);
+// @satisfies TASTER_LOGIC
+GPIOA->PUPDR |=  (0x55 << 22); // Pull-Up
   /* USER CODE END 2 */
-uint8_t pos = 0;
-uint8_t last_state = 1;
+
   /* Infinite loop */
+uint32_t counter = 0;
+uint8_t state = 0;
+static uint8_t last_state = 0;
+static uint32_t last_toggle1 = 0;
+static uint32_t last_toggle2 = 0;
+static uint32_t last_toggle3 = 0;
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
    
-     uint8_t current = (GPIOC->IDR & (1 << 13)) ? 1 : 0;
-     // Flanke: HIGH → LOW (Button gedrückt)
-    if (last_state == 1 && current == 0)
+   // einfacher Delay (~1ms je nach Takt anpassen!)
+    
+    for (volatile int i = 0; i < 16000; i++);
+    counter++;
+
+    // ----------------------
+    // Taster prüfen
+    // ----------------------
+    // @satisfies TASTER_LOGIC
+
+    if (!(GPIOA->IDR & (1 << 11)))
+        state = 1;
+    else if (!(GPIOA->IDR & (1 << 12)))
+        state = 2;
+    else if (!(GPIOA->IDR & (1 << 13)))
+        state = 3;
+    else if (!(GPIOA->IDR & (1 << 14)))
+        state = 4;
+    //else
+       // state = 0;   
+
+   // if (state != last_state)
+//{
+   // last_toggle1 = counter;
+   // last_toggle2 = counter;
+   // last_toggle3 = counter;
+    //last_state = state;
+//}
+    // LEDs zurücksetzen
+    //if (state == 0)
+     //{
+       //GPIOC->ODR &= ~0x0F;
+    // }
+
+    // ----------------------
+    // Verhalten
+    // ----------------------
+
+    // @satisfies TASTER_1
+    if (state == 1)
     {
-        // alle LEDs aus
-        GPIOC->ODR &= ~(0xFF);
-
-        // LED setzen
-        GPIOC->ODR |= (1 << pos);
-
-        pos++;
-        if (pos > 7) pos = 0;
+        if (counter - last_toggle1 >= 500) // ~500ms
+        {
+           // @satisfies T1_TIMING
+            GPIOC->ODR ^= (1 << 0);
+            last_toggle1 = counter;
+            if (GPIOC->ODR & (1 << 0))
+                printf("T1 LED1 ON\n");
+            else
+                printf("T1 LED1 OFF\n");
+        }
     }
 
-    last_state = current;
+    // @satisfies TASTER_2
+    else if (state == 2)
+    {
+      // @satisfies T2_TIMING
+        if (counter - last_toggle2 >= 1000)
+        {
+            GPIOC->ODR ^= (1 << 1);
+            last_toggle2 = counter;
+            if (GPIOC->ODR & (1 << 1))
+                printf("T2 LED2 ON\n");
+            else
+                printf("T2 LED2 OFF\n");
+        }
+    }
 
+    // @satisfies TASTER_3
+    else if (state == 3)
+    {
+        if (counter - last_toggle3 >= 500)
+        {
+            GPIOC->ODR ^= 0x0F;
+            last_toggle3 = counter;
+            printf("T3 ALL TOGGLE\n");
+        }
+    }
 
-    
-    
-
+    // @satisfies TASTER_4
+    else if (state == 4)
+    {
+        GPIOC->ODR |= 0x0F;
+        if (state != last_state)
+    {
+    printf("State: %d\n", state);
+    last_state = state;
+    }
+    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
