@@ -102,6 +102,15 @@ RCC->AHB1ENR |= (1 << 0); // GPIOA
 RCC->AHB1ENR |= (1 << 2); // GPIOC
 
 // ----------------------
+// TIM2 konfigurieren (1ms Tick)
+// ----------------------
+RCC->APB1ENR |= (1 << 0);   // TIM2 Clock
+
+TIM2->PSC = 16000 - 1;      // Prescaler → 16 MHz / 16000 = 1 kHz
+TIM2->ARR = 10 - 1;          // Auto Reload → 10 ms
+
+TIM2->CR1 |= (1 << 0);      // Timer starten
+// ----------------------
 // LED ( PC0)
 // ----------------------
 
@@ -135,8 +144,13 @@ static uint32_t last_toggle3 = 0;
    
    // einfacher Delay (~1ms je nach Takt anpassen!)
     
-    for (volatile int i = 0; i < 16000; i++);
-    counter++;
+    // 1. TIMER (1ms tick)
+    // ----------------------
+    if (TIM2->SR & 1)
+    {
+        TIM2->SR &= ~1;
+        counter+= 10;
+    }
 
     // ----------------------
     // Taster prüfen
