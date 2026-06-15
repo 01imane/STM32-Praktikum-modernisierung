@@ -1,7 +1,7 @@
 import serial
 import time
 
-ser = serial.Serial('COM7', 115200)  # anpassen!
+ser = serial.Serial('COM7', 115200)  # STM32 an COM7!
 
 print("Starte Test...")
 
@@ -25,7 +25,7 @@ if len(timestamps) > 1:
         print(f"{d:.2f} s")
 
     for d in diffs:
-        if 0.1 < d < 1.2:
+        if 0.40 < d < 0.55:
             print("✅ OK")
         else:
             print("❌ Fehler")

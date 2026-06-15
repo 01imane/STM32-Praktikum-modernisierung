@@ -106,8 +106,8 @@ RCC->AHB1ENR |= (1 << 2); // GPIOC
 // ----------------------
 RCC->APB1ENR |= (1 << 0);   // TIM2 Clock
 
-TIM2->PSC = 16000 - 1;      // Prescaler → 16 MHz / 16000 = 1 kHz
-TIM2->ARR = 10 - 1;          // Auto Reload → 10 ms
+TIM2->PSC = 84000 - 1;      // 84 MHz → 1 kHz
+TIM2->ARR =  1;          // Auto Reload → 10 ms
 
 TIM2->CR1 |= (1 << 0);      // Timer starten
 // ----------------------
@@ -149,7 +149,7 @@ static uint32_t last_toggle3 = 0;
     if (TIM2->SR & 1)
     {
         TIM2->SR &= ~1;
-        counter+= 10;
+        counter++;
     }
 
     // ----------------------
@@ -394,3 +394,4 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
