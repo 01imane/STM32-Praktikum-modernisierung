@@ -3,56 +3,62 @@ package Praktikum_Taster {
     private import Requirements::*;
 
     // -----------------------------
-    // TASTER 1
+    // INPUT
     // -----------------------------
-    requirement TASTER_1_BLINK_1HZ {
-        attribute id = "TASTER_1";
-        attribute text = "Bei Betätigung von Taster 1 (PA11 = LOW) blinkt LED1 (PC0) mit einer Frequenz von 1 Hz (Periode 1s, Tastverhältnis 50%).";
-        attribute status = "Approved";
-    }
-
-    // -----------------------------
-    // TASTER 2
-    // -----------------------------
-    requirement TASTER_2_BLINK_05HZ {
-        attribute id = "TASTER_2";
-        attribute text = "Bei Betätigung von Taster 2 (PA12 = LOW) blinkt LED2 (PC1) mit einer Frequenz von 0.5 Hz (Periode 2s).";
-        attribute status = "Approved";
-    }
-
-    // -----------------------------
-    // TASTER 3
-    // -----------------------------
-    requirement TASTER_3_ALL_BLINK {
-        attribute id = "TASTER_3";
-        attribute text = "Bei Betätigung von Taster 3 (PA13 = LOW) blinken alle LEDs (PC0–PC3) synchron mit 1 Hz.";
-        attribute status = "Approved";
-    }
-
-    // -----------------------------
-    // TASTER 4
-    // -----------------------------
-    requirement TASTER_4_ALL_ON {
-        attribute id = "TASTER_4";
-        attribute text = "Bei Betätigung von Taster 4 (PA14 = LOW) werden alle LEDs (PC0–PC3) dauerhaft eingeschaltet.";
-        attribute status = "Approved";
-    }
-
-    // -----------------------------
-    // INPUT LOGIK
-    // -----------------------------
-    requirement TASTER_INPUT_LOGIC {
+    requirement TASTER_LOGIC {
         attribute id = "TASTER_LOGIC";
-        attribute text = "Alle Taster sind als aktive LOW-Eingänge mit Pull-Up-Widerstand konfiguriert.";
+        attribute text = "Alle Taster sind als aktive LOW-Eingänge mit Pull-Up konfiguriert.";
         attribute status = "Approved";
     }
 
     // -----------------------------
-    // GPIO CONFIG
+    // GPIO
     // -----------------------------
-    requirement GPIO_CONFIGURATION {
+    requirement GPIO_CONFIG {
         attribute id = "GPIO_CONFIG";
-        attribute text = "GPIO Pins PA11–PA14 sind als Eingänge konfiguriert, PC0–PC3 als digitale Ausgänge.";
+        attribute text = "PA11–PA14 als Input, PC0–PC3 als Output.";
+        attribute status = "Approved";
+    }
+
+    // -----------------------------
+    // FUNKTIONAL
+    // -----------------------------
+    requirement TASTER_1_FUNCTION {
+        attribute id = "TASTER_1";
+        attribute text = "Bei PA11 LOW blinkt LED PC0.";
+        attribute status = "Approved";
+    }
+
+    requirement TASTER_2_FUNCTION {
+        attribute id = "TASTER_2";
+        attribute text = "Bei PA12 LOW blinkt LED PC1.";
+        attribute status = "Approved";
+    }
+
+    requirement TASTER_3_FUNCTION {
+        attribute id = "TASTER_3";
+        attribute text = "Bei PA13 LOW blinken alle LEDs.";
+        attribute status = "Approved";
+    }
+
+    requirement TASTER_4_FUNCTION {
+        attribute id = "TASTER_4";
+        attribute text = "Bei PA14 LOW sind alle LEDs an.";
+        attribute status = "Approved";
+    }
+
+    // -----------------------------
+    // TIMING
+    // -----------------------------
+    requirement T1_TIMING {
+        attribute id = "T1_TIMING";
+        attribute text = "LED PC0 blinkt mit 1 Hz ±10%.";
+        attribute status = "Approved";
+    }
+
+    requirement T2_TIMING {
+        attribute id = "T2_TIMING";
+        attribute text = "LED PC1 blinkt mit 0.5 Hz ±10%.";
         attribute status = "Approved";
     }
 }
