@@ -47,6 +47,7 @@ def parse_sysml_files(directory):
                 continue
 
             path = os.path.join(root, file)
+            print("Lese SysML:", path)
 
             with open(path, "r", encoding="utf-8") as f:
 
@@ -136,6 +137,7 @@ def check_c_implementations(directory, requirements):
                 continue
 
             path = os.path.join(root, file)
+            print("Prüfe:", path)
 
             with open(path, "r", encoding="utf-8") as f:
 
