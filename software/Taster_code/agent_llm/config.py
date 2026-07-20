@@ -1,13 +1,14 @@
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 # OpenAI API Key
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 # Modell
-MODEL = "gpt-4.1"
-
+MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free"
 # Temperatur
 TEMPERATURE = 0.2
 
 # maximale Antwort
-MAX_TOKENS = 600
+MAX_TOKENS = 1200
