@@ -92,7 +92,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   printf("Programm gestartet\r\n"); // zum testen
 //------------------------------------------------------
-    // @satisfies GPIO_CONFIGURATION
+    // @satisfies GPIO_CONFIG
     // GPIOC Clock aktivieren und PC0-PC7 als Ausgänge konfigurieren
     //------------------------------------------------------
 
