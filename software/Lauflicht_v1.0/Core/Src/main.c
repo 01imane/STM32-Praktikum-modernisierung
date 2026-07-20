@@ -92,7 +92,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
   printf("Programm gestartet\r\n"); // zum testen
 //------------------------------------------------------
-    // @satisfies GPIO_CONFIG
+    
+    // @satisfies GPIO_CONFIGURATION
+    // @satisfies LED_CONFIGURATION
     // GPIOC Clock aktivieren und PC0-PC7 als Ausgänge konfigurieren
     //------------------------------------------------------
 
@@ -145,6 +147,7 @@ TIM5->CR1|= TIM_CR1_CEN;               // Timer starten
     /* USER CODE END WHILE */
 //--------------------------------------------------
         // @satisfies RUNNING_LIGHT
+        
         //--------------------------------------------------
 
         if (TIM2->SR & 1)
