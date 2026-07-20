@@ -11,49 +11,50 @@ C_SATISFIES_PATTERN = re.compile(r'@satisfies\s+([A-Za-z0-9_-]+)')
 def parse_sysml_files(directory):
     requirements = {}
 
+    # komplette Requirement-Blöcke finden
+    requirement_pattern = re.compile(
+        r"requirement\s+\w+\s*\{.*?\}",
+        re.DOTALL
+    )
+
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswith('.sysml'):
-                path = os.path.join(root, file)
 
-                with open(path, 'r', encoding='utf-8') as f:
-                    content = f.read()
+            if not file.endswith(".sysml"):
+                continue
 
-                    for m in re.finditer(r"\brequirement\b", content):
-                        brace_start = content.find('{', m.end())
-                        if brace_start == -1:
-                            continue
+            path = os.path.join(root, file)
 
-                        depth = 0
-                        i = brace_start
-                        block = None
+            with open(path, "r", encoding="utf-8") as f:
+                content = f.read()
 
-                        while i < len(content):
-                            if content[i] == '{':
-                                depth += 1
-                            elif content[i] == '}':
-                                depth -= 1
-                                if depth == 0:
-                                    block = content[brace_start+1:i]
-                                    break
-                            i += 1
+            for match in requirement_pattern.finditer(content):
 
-                        if block is None:
-                            continue
+                block = match.group(0)
 
-                        id_match = SYSML_ID_PATTERN.search(block)
-                        status_match = SYSML_STATUS_PATTERN.search(block)
+                id_match = SYSML_ID_PATTERN.search(block)
+                status_match = SYSML_STATUS_PATTERN.search(block)
 
-                        if id_match:
-                            req_id = id_match.group(1)
-                            status = status_match.group(1) if status_match else "Unknown"
+                if not id_match:
+                    continue
 
-                            requirements[req_id] = {
-                                "status": status,
-                                "file": os.path.relpath(path),
-                                "implemented": False,
-                                "implemented_in": []
-                            }
+                req_id = id_match.group(1)
+                status = (
+                    status_match.group(1)
+                    if status_match
+                    else "Unknown"
+                )
+
+                requirements[req_id] = {
+                    "status": status,
+                    "file": os.path.relpath(path),
+                    "implemented": False,
+                    "implemented_in": []
+                }
+
+    print("\nGefundene Requirements:")
+    for req in sorted(requirements):
+        print(" -", req)
 
     return requirements
 
