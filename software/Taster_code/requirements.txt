@@ -1,0 +1,3 @@
+openai==1.107.1
+pyserial==3.5
+python-dotenv==1.1.1

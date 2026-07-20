@@ -18,11 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32f4xx.h" 
-#include <stdint.h>
-#include <stdio.h>
-
-
+#include<stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -48,7 +44,6 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,30 +56,23 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int __io_putchar(int ch)
-{
-    HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
-    return ch;
-}
+
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
- volatile uint8_t state = 0;
- volatile uint8_t mode = 0;     // Aktueller Betriebsmodus
 int main(void)
 {
 
   /* USER CODE BEGIN 1 */
- 
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -101,211 +89,94 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-
-// Debug-Ausgabe der aktuellen Taktfrequenzen über UART
-// Zur Überprüfung der System- und Bus-Taktkonfiguration
-  printf("SystemCoreClock = %lu\r\n", SystemCoreClock); // CPU-Systemtakt (SYSCLK)
-  printf("PCLK1 = %lu\r\n", HAL_RCC_GetPCLK1Freq()); // APB1-Peripherietakt (z. B. TIM2, TIM5)
-  printf("PCLK2 = %lu\r\n", HAL_RCC_GetPCLK2Freq()); // APB2-Peripherietakt
   /* USER CODE BEGIN 2 */
-// Clock aktivieren
-RCC->AHB1ENR |= (1 << 0); // GPIOA
-RCC->AHB1ENR |= (1 << 2); // GPIOC
+  printf("Programm gestartet\r\n"); // zum testen
+//------------------------------------------------------
+    // @satisfies GPIO_CONFIGURATION
+    // GPIOC Clock aktivieren und PC0-PC7 als Ausgänge konfigurieren
+    //------------------------------------------------------
 
-// ----------------------
-// TIM2 konfigurieren (1ms Tick)
-// ----------------------
-// TIM2 Clock aktivieren
-RCC->APB1ENR |= (1 << 0);
-/// ----------------------
-// TIM5 Zeitbasis
-// ----------------------
-RCC->APB1ENR |= (1 << 3);
+    RCC->AHB1ENR |= (1 << 2);
 
-TIM5->PSC = 84000 - 1;      // 1 ms
-TIM5->ARR = 0xFFFFFFFF; // autoreload
+    GPIOC->MODER &= ~(0xFFFF);
+    GPIOC->MODER |= 0x5555;
 
-TIM5->EGR = 1;              // <<< wichtig
-TIM5->SR = 0;
+    
+    //------------------------------------------------------
+// Zeitstempel-Timer (TIM5)
+// Läuft kontinuierlich mit 1 ms Auflösung
+//------------------------------------------------------
+
+RCC->APB1ENR |= (1 << 3);      // TIM5 Clock aktivieren
+
+TIM5->PSC = 84000 - 1;         // 84 MHz / 84000 = 1 kHz
+TIM5->ARR = 0xFFFFFFFF;        // Maximalwert (32 Bit)
+
+TIM5->EGR = TIM_EGR_UG;     // Prescaler sofort übernehmen
+
 TIM5->CNT = 0;
+TIM5->SR = 0;
+TIM5->CR1|= TIM_CR1_CEN;               // Timer starten
+    
+    
+    //------------------------------------------------------
+    // @satisfies TIMER_CONFIGURATION
+    // TIM2 als Zeitbasis konfigurieren
+    //------------------------------------------------------
 
-TIM5->CR1 = 1;
+    RCC->APB1ENR |= (1 << 0);
 
-// =====================================================
-// Timer-Konfiguration
-// Requirement: TIMER_CONFIGURATION
-// TIM2 erzeugt eine periodische Zeitbasis.
-//
-// @satisfies TIMER_CONFIGURATION
-// =====================================================
+    TIM2->PSC = 84000 -1 ;
+    TIM2->ARR = 1000 - 1;
 
+   TIM2->EGR = TIM_EGR_UG;     // Prescaler übernehmen
+   TIM2->SR = 0;               // UIF löschen
+   TIM2->CNT = 0;
+   TIM2->CR1 |= TIM_CR1_CEN;
 
-// 84 MHz und 1s
-TIM2->PSC = 84000 - 1;
-TIM2->ARR = 1000- 1 ;   // 1 s  autoreload
+    uint8_t led = 0;
 
-TIM2->EGR = 1;          // Werte sofort übernehmen
-TIM2->SR = 0;           // Flags löschen
-TIM2->CNT = 0;          // Zähler auf 0
-// Timer starten
-TIM2->CR1 |= (1 << 0);
-
-// ----------------------
-// LED ( PC0)
-// ----------------------
-
-// ----------------------
-
-// =====================================================
-// GPIO-Konfiguration
-// Requirement: GPIO_CONFIG
-// PA11–PA14 als Eingänge
-// PC0–PC3 als Ausgänge
-//
-// @satisfies GPIO_CONFIG
-// =====================================================
-
-GPIOC->MODER &= ~(0xFF);   // reset PC0–PC3
-GPIOC->MODER |=  (0x55);   // output
-
-// ----------------------
-// Taster PA11–PA14 Input
-// ----------------------
-GPIOA->MODER &= ~(0xFF << 22); // reset PA11–PA14
-
-// =====================================================
-// Tasterlogik
-// Requirement: TASTER_LOGIC
-// Active-Low Eingänge mit Pull-Up
-//
-// @satisfies TASTER_LOGIC
-// =====================================================
-
-// Pull-Up für alle
-GPIOA->PUPDR &= ~(0xFF << 22);
-GPIOA->PUPDR |=  (0x55 << 22); // Pull-Up
   /* USER CODE END 2 */
 
   /* Infinite loop */
-
   /* USER CODE BEGIN WHILE */
   while (1)
-{
-      // -----------------------------
-    // Taster prüfen
-    // -----------------------------
+  {
+    /* USER CODE END WHILE */
+//--------------------------------------------------
+        // @satisfies RUNNING_LIGHT
+        //--------------------------------------------------
 
-    // Taster 1 gedrückt
-    if (!(GPIOA->IDR & (1 << 11)))
-    {
-        mode = 1;
-    }
-
-    // Taster 2 gedrückt
-    else if (!(GPIOA->IDR & (1 << 12)))
-    {
-        mode = 2;
-    }
-
-    // Taster 3 gedrückt
-    else if (!(GPIOA->IDR & (1 << 13)))
-    {
-        mode = 3;
-    }
-
-    // Taster 4 gedrückt
-    else if (!(GPIOA->IDR & (1 << 14)))
-    {
-        mode = 4;
-    }
-
-    // --------------------------------
-    // Timer ist abgelaufen?
-    // --------------------------------
-    if (TIM2->SR & 1)
-    {
-        // Update-Flag löschen
-        TIM2->SR &= ~(1 << 0);
-
-        switch (mode)
+        if (TIM2->SR & 1)
         {
-  // =====================================================
-// Requirement: TASTER_1_FUNCTION
-// Requirement: T1_TIMING
-//
-// @satisfies TASTER_1_FUNCTION
-// @satisfies T1_TIMING
-// =====================================================
+            TIM2->SR &= ~1;
 
-            // -------------------------
-            // Modus 1
-            // LED1 blinkt
-            // -------------------------
-            case 1:
-                GPIOC->ODR ^= (1 << 0);      // PC0 umschalten
-                GPIOC->ODR &= ~0x0E;         // PC1-PC3 ausschalten
-               printf("LED1 TOGGLE %lu\r\n", TIM5->CNT);
+            //--------------------------------------------------
+            // @satisfies LED_SEQUENCE
+            //--------------------------------------------------
 
-                break;
+            GPIOC->ODR = (1 << led);
 
-// =====================================================
-// Requirement: TASTER_2_FUNCTION
-// Requirement: T2_TIMING
-//
-// @satisfies TASTER_2_FUNCTION
-// @satisfies T2_TIMING
-// =====================================================           
+            //--------------------------------------------------
+            // @satisfies LED_TIMING
+            // UART-Ausgabe für den Python-Test
+            //--------------------------------------------------
 
-            // -------------------------
-            // Modus 2
-            // LED2 blinkt
-            // -------------------------
-            case 2:
-                GPIOC->ODR ^= (1 << 1);      // PC1 umschalten
-                GPIOC->ODR &= ~0x0D;         // PC0,PC2,PC3 aus
-                printf("LED2 TOGGLE %lu\r\n", TIM5->CNT);
+            //printf("LED%d ON %lu\r\n", led + 1, TIM5->CNT);
+            printf("LED%d ON %lu\r\n", led + 1, TIM5->CNT);
+          
+            
+              
 
-                break;
+            led++;
 
-// =====================================================
-// Requirement: TASTER_3_FUNCTION
-//
-// @satisfies TASTER_3_FUNCTION
-// =====================================================        
-
-            // -------------------------
-            // Modus 3
-            // Alle LEDs blinken
-            // -------------------------
-            case 3:
-                GPIOC->ODR ^= 0x0F;
-                printf("ALL TOGGLE %lu\r\n", TIM5->CNT);
-                break;
-// =====================================================
-// Requirement: TASTER_4_FUNCTION
-//
-// @satisfies TASTER_4_FUNCTION
-// =====================================================
-
-
-            // -------------------------
-            // Modus 4
-            // Alle LEDs dauerhaft an
-            // -------------------------
-            case 4:
-                GPIOC->ODR = 0x0F;
-                printf("ALL ON %lu\r\n", TIM5->CNT);
-                break;
-
-            // -------------------------
-            // Kein Modus gewählt
-            // -------------------------
-            default:
-                GPIOC->ODR = 0x00;
-                break;
+            if (led >= 8)
+                led = 0;
         }
-    }
-}
+
+    
+    /* USER CODE BEGIN 3 */
+  }
   /* USER CODE END 3 */
 }
 
@@ -429,7 +300,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+int __io_putchar(int ch)
+{
+    HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
 /* USER CODE END 4 */
 
 /**
@@ -462,4 +337,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
