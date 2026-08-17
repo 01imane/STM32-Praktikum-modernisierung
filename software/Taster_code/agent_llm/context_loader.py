@@ -1,4 +1,7 @@
 from pathlib import Path
+from .git_reader import git_log
+from .git_reader import git_status
+from .git_reader import git_diff
 
 
 # --------------------------------------------------
@@ -51,6 +54,8 @@ def load_traceability():
 def load_hardware():
 
     return """
+Hardwareplattform
+
 Board:
 STM32 NUCLEO-F446RE
 
@@ -60,36 +65,25 @@ STM32F446RE
 CPU:
 ARM Cortex-M4
 
-Takt:
-84 MHz
-
 Programmierstil:
 Registerbasierte Programmierung
 
-UART:
-USART2
+Systemtakt:
+84 MHz
 
-Timer:
-TIM2
-TIM5
+Peripherie:
 
-GPIO:
+- GPIO
+- Timer
+- UART
+- ADC
+- DAC/PWM
+- SPI
+- I²C
 
-PA11 -> Taster 1
-
-PA12 -> Taster 2
-
-PA13 -> Taster 3
-
-PA14 -> Taster 4
-
-PC0 -> LED1
-
-PC1 -> LED2
-
-PC2 -> LED3
-
-PC3 -> LED4
+Die tatsächlich verwendeten Peripheriemodule sind anhand
+des Programmcodes (main.c) sowie der SysML-Modelle zu
+identifizieren und bei der Analyse zu berücksichtigen.
 
 Entwicklungsumgebung:
 
@@ -129,8 +123,26 @@ def load_compiler_log():
 
 def load_git_information():
 
-    return """
-Git Informationen werden später ergänzt.
+    return f"""
+
+=======================
+Git Log
+=======================
+
+{git_log()}
+
+=======================
+Git Status
+=======================
+
+{git_status()}
+
+=======================
+Git Diff
+=======================
+
+{git_diff()}
+
 """
 
 

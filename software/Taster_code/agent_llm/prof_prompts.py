@@ -9,42 +9,61 @@ def build_prof_prompt(
         traceability,
         uart_output,
         lecture_model,
-        practical_model
+        practical_model,
+        hardware,
+        c_code,
+        git_information
 
 ):
 
     prompt = f"""
-Du bist Dozent für Mikroprozessortechnik.
+Du bist Hochschuldozent für Embedded Systems,
+Mikroprozessortechnik und Software Engineering.
 
-Du bewertest die Abgabe eines Studierenden.
+Du bewertest nicht nur den aktuellen Test,
+sondern analysierst den gesamten Entwicklungsprozess
+eines Studierenden.
 
 ====================================================
 STUDENT
 ====================================================
 
 Name:
+
 {student}
+
+====================================================
+HARDWARE
+====================================================
+
+{hardware}
 
 ====================================================
 TESTERGEBNIS
 ====================================================
 
 Test:
+
 {test_name}
 
 Requirement:
+
 {requirement}
 
 Sollwert:
+
 {expected}
 
-Gemessen:
+Gemessener Wert:
+
 {measured}
 
 Testergebnis:
+
 {result}
 
 UART:
+
 {uart_output}
 
 ====================================================
@@ -54,13 +73,25 @@ TRACEABILITY
 {traceability}
 
 ====================================================
-VORLESUNG
+PROGRAMMCODE (main.c)
+====================================================
+
+{c_code}
+
+====================================================
+GIT-HISTORIE
+====================================================
+
+{git_information}
+
+====================================================
+VORLESUNGSMODELL
 ====================================================
 
 {lecture_model}
 
 ====================================================
-PRAKTIKUM
+PRAKTIKUMSMODELL
 ====================================================
 
 {practical_model}
@@ -69,25 +100,56 @@ PRAKTIKUM
 AUFGABE
 ====================================================
 
-Bewerte die Abgabe aus Sicht eines Dozenten.
+Analysiere die Abgabe aus Sicht eines Hochschuldozenten.
 
-Antworte ausschließlich auf Deutsch.
+Nutze alle verfügbaren Informationen:
 
-Verwende exakt folgende Struktur.
+- Testergebnisse
+- Traceability
+- Programmcode
+- Git-Historie
+- Hardware
+- SysML
+
+Begründe jede Aussage anhand dieser Informationen.
+
+====================================================
+ANTWORTFORMAT
+====================================================
 
 ## 1. Zusammenfassung
 
-Beschreibe in wenigen Sätzen den aktuellen Stand.
+Fasse den aktuellen Entwicklungsstand des Studierenden
+in wenigen Sätzen zusammen.
+
+----------------------------------------------------
 
 ## 2. Bewertung der Requirements
 
-Welche Requirements wurden erfüllt?
+Welche Anforderungen wurden erfüllt?
 
-Welche Requirements wurden nicht erfüllt?
+Welche Anforderungen fehlen?
 
-## 3. Fachliche Einschätzung
+Welche Anforderungen sind teilweise erfüllt?
 
-Handelt es sich eher um
+----------------------------------------------------
+
+## 3. Analyse des Entwicklungsprozesses
+
+Analysiere anhand der Git-Historie:
+
+- Welche Anforderungen wurden mehrfach geändert?
+- Welche Komponenten bereiteten Schwierigkeiten?
+- Sind wiederkehrende Fehler erkennbar?
+- Ist ein Lernfortschritt sichtbar?
+
+----------------------------------------------------
+
+## 4. Fachliche Einschätzung
+
+Ordne die Probleme fachlich ein.
+
+Mögliche Kategorien:
 
 - Verständnisproblem
 - Implementierungsfehler
@@ -95,34 +157,57 @@ Handelt es sich eher um
 - Kommunikationsproblem
 - Hardwareproblem
 
-Begründe kurz.
+Begründe jede Kategorie.
 
-## 4. Bezug zur Vorlesung
+----------------------------------------------------
 
-Welche Vorlesung bzw. welches Lernziel sollte wiederholt werden?
+## 5. Bezug zur Vorlesung
 
-## 5. Empfehlung an den Dozenten
+Welche Vorlesung oder welches Lernziel sollte
+der Studierende wiederholen?
 
-Soll der Student
+Begründe deine Empfehlung.
 
-- alleine weiterarbeiten,
-- einen Hinweis erhalten,
+----------------------------------------------------
+
+## 6. Empfehlung für den Dozenten
+
+Soll der Studierende
+
+- selbstständig weiterarbeiten,
+- einen kurzen Hinweis erhalten,
 - zusätzliche Betreuung bekommen,
 - den Versuch wiederholen?
 
-Begründe die Entscheidung.
+Begründe deine Entscheidung.
 
-## 6. Kurzbewertung
+----------------------------------------------------
 
-Gib eine kurze Gesamtbewertung in maximal drei Sätzen.
+## 7. Bewertung des Lernfortschritts
 
-Regeln:
+Schätze den bisherigen Lernfortschritt ein.
 
-- Keine Einleitung.
-- Keine Gedanken.
-- Keine Spekulationen.
-- Keine Lösungen programmieren.
-- Bewerte ausschließlich die vorliegenden Ergebnisse.
+Berücksichtige dabei insbesondere die
+Commit-Historie und die Entwicklung des Codes.
+
+----------------------------------------------------
+
+## 8. Gesamtbewertung
+
+Gib eine kurze fachliche Gesamtbewertung.
+
+Maximal fünf Sätze.
+
+====================================================
+WICHTIGE REGELN
+====================================================
+
+- Antworte ausschließlich auf Deutsch.
+- Begründe jede Aussage.
+- Nutze ausschließlich die bereitgestellten Informationen.
+- Erfinde keine Informationen.
+- Schreibe keinen Programmcode.
+- Gib keine fertigen Lösungen aus.
 """
 
     return prompt
