@@ -1,7 +1,5 @@
 from pathlib import Path
-from .git_reader import git_log
-from .git_reader import git_status
-from .git_reader import git_diff
+from .git_reader import load_git_information
 
 
 # --------------------------------------------------
@@ -117,33 +115,9 @@ def load_compiler_log():
     return "Kein Compiler-Log vorhanden."
 
 
-# --------------------------------------------------
-# Git Informationen
-# --------------------------------------------------
 
-def load_git_information():
 
-    return f"""
 
-=======================
-Git Log
-=======================
-
-{git_log()}
-
-=======================
-Git Status
-=======================
-
-{git_status()}
-
-=======================
-Git Diff
-=======================
-
-{git_diff()}
-
-"""
 
 
 # --------------------------------------------------
