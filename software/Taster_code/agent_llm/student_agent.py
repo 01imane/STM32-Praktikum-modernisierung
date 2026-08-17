@@ -8,6 +8,7 @@ def student_agent(
     test_name,
     expected,
     average,
+    tolerance,
     requirement,
     uart_output
 ):
@@ -15,15 +16,22 @@ def student_agent(
     # SysML-Modelle laden
     lecture, practical = load_models()
 
+    # Gemeinsamen Kontext laden
+    context = load_context()
+
     # Prompt erzeugen
     prompt = build_prompt(
 
         test_name=test_name,
         expected=expected,
         average=average,
+        tolerance=tolerance,
         requirement=requirement,
+
         lecture_model=lecture,
         practical_model=practical,
+
+
         hardware=context["hardware"],
         c_code=context["c_code"],
         traceability=context["traceability"],

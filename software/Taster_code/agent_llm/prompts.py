@@ -3,6 +3,7 @@ def build_prompt(
         test_name,
         expected,
         average,
+        tolerance,
         requirement,
         lecture_model,
         practical_model,
@@ -54,6 +55,10 @@ Sollwert:
 Gemessener Mittelwert:
 
 {average} ms
+
+Toleranz:
+
+± {tolerance} ms
 
 UART-Ausgabe:
 

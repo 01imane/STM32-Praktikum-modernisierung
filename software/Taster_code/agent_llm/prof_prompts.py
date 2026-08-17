@@ -24,6 +24,16 @@ Du bewertest nicht nur den aktuellen Test,
 sondern analysierst den gesamten Entwicklungsprozess
 eines Studierenden.
 
+Ziel ist es,
+
+- den Lernstand des Studierenden einzuschätzen,
+- typische fachliche Schwierigkeiten zu identifizieren,
+- den Lernfortschritt anhand der Git-Historie zu bewerten,
+- Empfehlungen zur Verbesserung der Lehre abzuleiten.
+
+Bewerte den Entwicklungsprozess objektiv anhand der bereitgestellten Informationen.
+Treffe keine Aussagen, die nicht durch die Daten gestützt werden.
+
 ====================================================
 STUDENT
 ====================================================
@@ -108,6 +118,13 @@ Nutze alle verfügbaren Informationen:
 - Traceability
 - Programmcode
 - Git-Historie
+  Analysiere insbesondere:
+
+- Commit-Häufigkeit
+- Commit-Struktur
+- Commit-Nachrichten
+- wiederholte Änderungen
+- Entwicklung des Programmcodes
 - Hardware
 - SysML
 
@@ -142,6 +159,15 @@ Analysiere anhand der Git-Historie:
 - Welche Komponenten bereiteten Schwierigkeiten?
 - Sind wiederkehrende Fehler erkennbar?
 - Ist ein Lernfortschritt sichtbar?
+- Welche Requirements wurden mehrfach überarbeitet?
+
+- Welche Komponenten verursachten wiederholt Probleme?
+
+- Ist ein systematischer Lernfortschritt erkennbar?
+
+- Zeigen die Commits ein planmäßiges Vorgehen oder häufiges Trial-and-Error?
+
+- Welche Themen scheinen sicher beherrscht zu werden?
 
 ----------------------------------------------------
 
@@ -151,6 +177,12 @@ Ordne die Probleme fachlich ein.
 
 Mögliche Kategorien:
 
+Berücksichtige dabei:
+
+- Testergebnisse
+- Programmcode
+- Traceability
+- Git-Historie
 - Verständnisproblem
 - Implementierungsfehler
 - Konfigurationsfehler
@@ -163,24 +195,28 @@ Begründe jede Kategorie.
 
 ## 5. Bezug zur Vorlesung
 
-Welche Vorlesung oder welches Lernziel sollte
-der Studierende wiederholen?
+Welche Vorlesungsinhalte oder Lernziele
+wurden vermutlich noch nicht vollständig verstanden?
 
-Begründe deine Empfehlung.
-
+Begründe deine Einschätzung anhand der bereitgestellten Informationen.
 ----------------------------------------------------
 
 ## 6. Empfehlung für den Dozenten
 
-Soll der Studierende
+## 6. Empfehlung für den Dozenten
 
-- selbstständig weiterarbeiten,
-- einen kurzen Hinweis erhalten,
-- zusätzliche Betreuung bekommen,
-- den Versuch wiederholen?
+Empfiehl geeignete Maßnahmen.
 
-Begründe deine Entscheidung.
+Zum Beispiel:
 
+- kurzer Hinweis
+- individuelles Feedback
+- zusätzliche Übung
+- Wiederholung einer Vorlesung
+- Wiederholung des Praktikums
+- keine weiteren Maßnahmen
+
+Begründe deine Empfehlung.
 ----------------------------------------------------
 
 ## 7. Bewertung des Lernfortschritts
@@ -189,14 +225,33 @@ Schätze den bisherigen Lernfortschritt ein.
 
 Berücksichtige dabei insbesondere die
 Commit-Historie und die Entwicklung des Codes.
+Bewerte den Lernfortschritt als
+
+- gering
+- moderat
+- gut
+- sehr gut
+
+und begründe deine Entscheidung.
 
 ----------------------------------------------------
 
-## 8. Gesamtbewertung
+## 8. Verbesserung des Praktikums
 
-Gib eine kurze fachliche Gesamtbewertung.
+Leite aus den Ergebnissen Empfehlungen
+für die Weiterentwicklung des Praktikums ab.
 
-Maximal fünf Sätze.
+Beispiele:
+
+- Welche Themen sollten ausführlicher erklärt werden?
+
+- Welche Anforderungen bereiten häufig Schwierigkeiten?
+
+- Sollte das Testframework erweitert werden?
+
+- Sind zusätzliche Hinweise oder Beispiele sinnvoll?
+
+Begründe deine Vorschläge..
 
 ====================================================
 WICHTIGE REGELN
