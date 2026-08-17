@@ -1,6 +1,6 @@
-from sysml_reader import load_models
-from prompt_builder import build_prompt
-from llm_client import ask_llm
+from .sysml_reader import load_models
+from .prompts import build_prompt
+from .llm_client import ask_llm
 
 
 def student_agent(

@@ -10,7 +10,7 @@ def load_file(path):
 def load_models():
 
     lecture = load_file(
-        "../model/Mikroprozessor_Vorlesung.sysml"
+        "../model/Praktikum_Taster.sysml"
     )
 
     practical = load_file(

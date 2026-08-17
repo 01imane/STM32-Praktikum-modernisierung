@@ -11,10 +11,21 @@ def build_prompt(
 ):
 
     prompt = f"""
+Du bist ein Tutor für Embedded Systems und Mikroprozessortechnik.
 
-Du bist ein Embedded-Systems Tutor.
+Du bewertest ausschließlich Praktikumsversuche mit einem
+STM32 NUCLEO-F446RE.
 
-Analysiere folgenden Test.
+Hardware:
+- SystemCoreClock = 84 MHz
+- TIM2 erzeugt die Blinkfrequenz.
+- TIM5 dient ausschließlich als Zeitstempel.
+- UART2 überträgt die Messdaten an den PC.
+- LEDs sind über GPIO angesteuert.
+
+==================================================
+TESTERGEBNIS
+==================================================
 
 Test:
 {test_name}
@@ -22,46 +33,66 @@ Test:
 Requirement:
 {requirement}
 
-Erwartete Blinkzeit:
-
+Sollwert:
 {expected} ms
 
-Gemessene Blinkzeit:
+Gemessener Mittelwert:
+{average:.1f} ms
 
-{average} ms
-
-UART Ausgabe:
-
+UART-Messwerte:
 {uart_output}
 
-========================
-
-Vorlesungsmodell
-
-========================
+==================================================
+VORLESUNGSMODELL
+==================================================
 
 {lecture_model}
 
-========================
-
-Praktikumsmodell
-
-========================
+==================================================
+PRAKTIKUMSMODELL
+==================================================
 
 {practical_model}
 
-Bitte beantworte:
+==================================================
+AUFGABE
+==================================================
 
-1. Wurde Requirement erfüllt?
+Analysiere das Testergebnis.
 
-2. Welche Ursache hat der Fehler?
+Antworte ausschließlich auf Deutsch.
 
-3. Welche Register sind wahrscheinlich falsch?
+Verwende exakt folgende Struktur:
 
-4. Welche Vorlesung muss wiederholt werden?
+## 1. Bewertung
 
-5. Gib Verbesserungsvorschläge.
+- Requirement erfüllt: Ja oder Nein
 
+## 2. Fehleranalyse
+
+Beschreibe kurz die wahrscheinlichste Ursache.
+
+## 3. Wahrscheinlich betroffene Register
+
+Nenne nur die relevanten STM32-Register.
+
+## 4. Relevante Vorlesung
+
+Ordne den Fehler einer Vorlesung bzw. einem Lernziel aus dem Vorlesungsmodell zu.
+
+## 5. Verbesserungsvorschlag
+
+Gib konkrete Schritte zur Fehlerbehebung.
+
+Regeln:
+
+- Keine Einleitung.
+- Keine Beschreibung deiner Rolle.
+- Keine Gedanken oder Überlegungen.
+- Keine Spekulationen über unbekannte Hardware.
+- Beziehe dich ausschließlich auf die bereitgestellten Daten.
+- Falls Informationen fehlen, weise kurz darauf hin.
+- Antworte präzise und technisch korrekt.
 """
 
     return prompt
