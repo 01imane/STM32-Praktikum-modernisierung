@@ -62,8 +62,15 @@ except Exception as e:
         test_name="UART",
         expected=0,
         average=0,
+        tolerance=0,
         requirement="UART_CONNECTION",
-        uart_output=str(e)
+        uart_output=f"""
+        UART konnte nicht geöffnet werden.
+
+        Fehlermeldung:
+
+        {e}
+        """
     )
 
     sys.exit()
@@ -71,7 +78,7 @@ except Exception as e:
 print("\nStarte Test...\n")
 
 timestamps = []
-received = False
+
 
 start = time.time()
 TIMEOUT = 20      # Sekunden
@@ -89,9 +96,14 @@ while True:
           test_name=expected_message,
           expected=EXPECTED_TIME,
           average=0,
+          tolerance=TOLERANCE,
           requirement=requirement,
-          uart_output="Keine UART-Daten empfangen."
-            )
+          uart_output= f"""
+            Timeout nach {TIMEOUT} Sekunden.
+
+            Es wurden keine UART-Daten empfangen.
+        """
+)
         ser.close()
         sys.exit()
 
@@ -113,8 +125,15 @@ while True:
             test_name=expected_message,
             expected=EXPECTED_TIME,
             average=0,
+            tolerance=TOLERANCE,
             requirement=requirement,
-            uart_output=line
+            uart_output=f"""
+              Erwartet:
+              {expected_message}
+
+              Empfangen:
+              {line}
+            """
 )
         ser.close()
         sys.exit()
@@ -127,8 +146,15 @@ while True:
             test_name=expected_message,
             expected=EXPECTED_TIME,
             average=0,
+            tolerance=TOLERANCE,
             requirement=requirement,
-            uart_output=line
+            uart_output=f"""
+              Erwartet:
+              {expected_message}
+
+              Empfangen:
+              {line}
+            """
 )
         ser.close()
         sys.exit()
@@ -141,8 +167,15 @@ while True:
             test_name=expected_message,
             expected=EXPECTED_TIME,
             average=0,
+            tolerance=TOLERANCE,
             requirement=requirement,
-            uart_output=line
+            uart_output=f"""
+              Erwartet:
+              {expected_message}
+
+              Empfangen:
+              {line}
+            """
 )
         ser.close()
         sys.exit()
@@ -155,8 +188,15 @@ while True:
             test_name=expected_message,
             expected=EXPECTED_TIME,
             average=0,
+            tolerance=TOLERANCE,
             requirement=requirement,
-            uart_output=line
+            uart_output=f"""
+              Erwartet:
+              {expected_message}
+
+              Empfangen:
+              {line}
+            """
 )
         ser.close()
         sys.exit()
@@ -166,7 +206,7 @@ while True:
     # -----------------------------
     if line.startswith(expected_message):
 
-        received = True
+      
 
         if blink_test:
 
@@ -187,6 +227,7 @@ while True:
                 test_name=expected_message,
                 expected=0,
                 average=0,
+                tolerance=0,
                 requirement=requirement,
                 uart_output="ALL ON erfolgreich."
     )
@@ -209,6 +250,7 @@ if len(timestamps) < 2:
             test_name=expected_message,
             expected=EXPECTED_TIME,
             average=0,
+            tolerance=TOLERANCE,
             requirement=requirement,
             uart_output="Keine Blinkereignisse erkannt."
 )
@@ -228,16 +270,13 @@ for i in range(len(timestamps)-1):
 
     if abs(dt - EXPECTED_TIME) <= TOLERANCE:
 
-        print("   ✅ OK")
+      print("   ✅ Innerhalb der Toleranz")
 
     else:
 
-        passed = False
+      passed = False
 
-        if dt < EXPECTED_TIME:
-            print("   ❌ Zu schnell")
-        else:
-            print("   ❌ Zu langsam")
+      print("   ⚠️ Außerhalb der Toleranz")
 
 average = sum(diffs) / len(diffs)
 
@@ -245,32 +284,14 @@ print("\n--------------------------------")
 print(f"Durchschnitt: {average:.1f} ms")
 print("--------------------------------")
 
-# -----------------------------
-# AI-Agent
-# -----------------------------
-if not passed:
 
-    student_agent(
-    test_name=expected_message,
-    expected=EXPECTED_TIME,
-    average=average,
-    requirement=requirement,
-    uart_output=str(diffs)
-)
-# -----------------------------
 # Ergebnis
 # -----------------------------
 if passed:
 
     print("\n==============================")
     print("✅ TEST BESTANDEN")
-    student_agent(
-        test_name=expected_message,
-        expected=EXPECTED_TIME,
-        average=average,
-        requirement=requirement,
-        uart_output=str(diffs)
-)
+   
     print("==============================")
 
 else:
@@ -278,3 +299,36 @@ else:
     print("\n==============================")
     print("❌ TEST NICHT BESTANDEN")
     print("==============================")
+
+
+student_agent(
+
+    test_name=expected_message,
+
+    expected=EXPECTED_TIME,
+
+    average=average,
+    
+    tolerance=TOLERANCE,
+
+    requirement=requirement,
+
+    uart_output= f"""
+    Messwerte:
+
+    {diffs}
+
+    Durchschnitt:
+
+    {average:.1f} ms
+
+    Sollwert:
+
+    {EXPECTED_TIME} ms
+
+    Toleranz:
+
+    ±{TOLERANCE} ms
+    """
+
+   )
