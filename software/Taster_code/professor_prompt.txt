@@ -1,0 +1,1320 @@
+
+Du bist Hochschuldozent für Embedded Systems,
+Mikroprozessortechnik und Software Engineering.
+
+Du bewertest nicht nur das Ergebnis eines einzelnen Tests,
+sondern analysierst den gesamten Entwicklungsprozess eines Studierenden.
+
+Dein Ziel ist es,
+
+- den Lernstand einzuschätzen,
+- fachliche Schwierigkeiten zu erkennen,
+- den Lernfortschritt anhand der Git-Historie zu bewerten,
+- Hinweise für den Studierenden abzuleiten,
+- Empfehlungen für den Lehrenden zu geben,
+- sowie Verbesserungspotenziale des Praktikums zu identifizieren.
+
+Treffe ausschließlich Aussagen,
+die durch die bereitgestellten Informationen gestützt werden.
+
+Falls Informationen fehlen,
+weise ausdrücklich darauf hin.
+
+====================================================
+STUDENT
+====================================================
+
+Name:
+
+Imane
+
+====================================================
+HARDWARE
+====================================================
+
+
+Hardwareplattform
+
+Board:
+STM32 NUCLEO-F446RE
+
+Mikrocontroller:
+STM32F446RE
+
+CPU:
+ARM Cortex-M4
+
+Programmierstil:
+Registerbasierte Programmierung
+
+Systemtakt:
+84 MHz
+
+Peripherie:
+
+- GPIO
+- Timer
+- UART
+- ADC
+- DAC/PWM
+- SPI
+- I²C
+
+Die tatsächlich verwendeten Peripheriemodule sind anhand
+des Programmcodes (main.c) sowie der SysML-Modelle zu
+identifizieren und bei der Analyse zu berücksichtigen.
+
+Entwicklungsumgebung:
+
+STM32CubeMX
+
+Visual Studio Code
+
+Git
+
+GitHub / GitLab
+
+Python Testframework
+
+OpenRouter API
+
+
+
+====================================================
+TESTERGEBNIS
+====================================================
+
+Test:
+
+LED1 TOGGLE
+
+Requirement:
+
+TASTER_1_FUNCTION
+
+Sollwert:
+
+1000 ms
+
+Gemessener Wert:
+
+1000.0 ms
+
+Toleranz:
+
+± 20 ms
+
+Testergebnis:
+
+True
+
+UART-Ausgabe:
+
+
+Messwerte:
+
+[1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]
+
+Durchschnitt:
+
+1000.0 ms
+
+Sollwert:
+
+1000 ms
+
+Toleranz:
+
+±20 ms
+
+
+====================================================
+TRACEABILITY REPORT
+====================================================
+
+# Traceability Report
+
+**Gesamt Anforderungen:** 9
+
+**Implementiert:** 9
+
+**Abdeckung:** 100.0%
+
+| Requirement | Req.Status | Impl.Status | Lernziel | Code | Datei |
+|--------------|------------|-------------|----------|------|-------|
+| GPIO_CONFIG | Approved | Implemented | GPIO_Konfiguration | Ja | model\Praktikum_Taster.sysml |
+| T1_TIMING | Approved | Implemented | Prescaler_ARR | Ja | model\Praktikum_Taster.sysml |
+| T2_TIMING | Approved | Implemented | Prescaler_ARR | Ja | model\Praktikum_Taster.sysml |
+| TASTER_1_FUNCTION | Approved | Implemented | Digitale_Ausgaenge | Ja | model\Praktikum_Taster.sysml |
+| TASTER_2_FUNCTION | Approved | Implemented | Digitale_Ausgaenge | Ja | model\Praktikum_Taster.sysml |
+| TASTER_3_FUNCTION | Approved | Implemented | Digitale_Ausgaenge | Ja | model\Praktikum_Taster.sysml |
+| TASTER_4_FUNCTION | Approved | Implemented | Digitale_Ausgaenge | Ja | model\Praktikum_Taster.sysml |
+| TASTER_LOGIC | Approved | Implemented | Digitale_Eingaenge | Ja | model\Praktikum_Taster.sysml |
+| TIMER_CONFIGURATION | Approved | Implemented | Timer_Grundlagen | Ja | model\Praktikum_Taster.sysml |
+
+
+====================================================
+PROGRAMMCODE (main.c)
+====================================================
+
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "stm32f4xx.h" 
+#include <stdint.h>
+#include <stdio.h>
+
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart2;
+
+/* USER CODE BEGIN PV */
+
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+int __io_putchar(int ch)
+{
+    HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+ volatile uint8_t state = 0;
+ volatile uint8_t mode = 0;     // Aktueller Betriebsmodus
+int main(void)
+{
+
+  /* USER CODE BEGIN 1 */
+ 
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+
+
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART2_UART_Init();
+
+// Debug-Ausgabe der aktuellen Taktfrequenzen über UART
+// Zur Überprüfung der System- und Bus-Taktkonfiguration
+  printf("SystemCoreClock = %lu\r\n", SystemCoreClock); // CPU-Systemtakt (SYSCLK)
+  printf("PCLK1 = %lu\r\n", HAL_RCC_GetPCLK1Freq()); // APB1-Peripherietakt (z. B. TIM2, TIM5)
+  printf("PCLK2 = %lu\r\n", HAL_RCC_GetPCLK2Freq()); // APB2-Peripherietakt
+  /* USER CODE BEGIN 2 */
+// Clock aktivieren
+RCC->AHB1ENR |= (1 << 0); // GPIOA
+RCC->AHB1ENR |= (1 << 2); // GPIOC
+
+// ----------------------
+// TIM2 konfigurieren (1ms Tick)
+// ----------------------
+// TIM2 Clock aktivieren
+RCC->APB1ENR |= (1 << 0);
+/// ----------------------
+// TIM5 Zeitbasis
+// ----------------------
+RCC->APB1ENR |= (1 << 3);
+
+TIM5->PSC = 84000 - 1;      // 1 ms
+TIM5->ARR = 0xFFFFFFFF; // autoreload
+
+TIM5->EGR = 1;              // <<< wichtig
+TIM5->SR = 0;
+TIM5->CNT = 0;
+
+TIM5->CR1 = 1;
+
+// =====================================================
+// Timer-Konfiguration
+// Requirement: TIMER_CONFIGURATION
+// TIM2 erzeugt eine periodische Zeitbasis.
+//
+// @satisfies TIMER_CONFIGURATION
+// =====================================================
+
+
+// 84 MHz und 1s
+TIM2->PSC = 84000 - 1;
+TIM2->ARR = 1000-1 ;   // 0,5 s  autoreload
+
+TIM2->EGR = 1;          // Werte sofort übernehmen
+TIM2->SR = 0;           // Flags löschen
+TIM2->CNT = 0;          // Zähler auf 0
+// Timer starten
+TIM2->CR1 |= (1 << 0);
+
+// ----------------------
+// LED ( PC0)
+// ----------------------
+
+// ----------------------
+
+// =====================================================
+// GPIO-Konfiguration
+// Requirement: GPIO_CONFIG
+// PA11–PA14 als Eingänge
+// PC0–PC3 als Ausgänge
+//
+// @satisfies GPIO_CONFIG
+// =====================================================
+
+GPIOC->MODER &= ~(0xFF);   // reset PC0–PC3
+//GPIOC->MODER |=  (0x55);   // output
+
+// ----------------------
+// Taster PA11–PA14 Input
+// ----------------------
+GPIOA->MODER &= ~(0xFF << 22); // reset PA11–PA14
+
+// =====================================================
+// Tasterlogik
+// Requirement: TASTER_LOGIC
+// Active-Low Eingänge mit Pull-Up
+//
+// @satisfies TASTER_LOGIC
+// =====================================================
+
+// Pull-Up für alle
+GPIOA->PUPDR &= ~(0xFF << 22);
+GPIOA->PUPDR |=  (0x55 << 22); // Pull-Up
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+
+  /* USER CODE BEGIN WHILE */
+  while (1)
+{
+      // -----------------------------
+    // Taster prüfen
+    // -----------------------------
+
+    // Taster 1 gedrückt
+    if (!(GPIOA->IDR & (1 << 11)))
+    {
+        mode = 1;
+    }
+
+    // Taster 2 gedrückt
+    else if (!(GPIOA->IDR & (1 << 12)))
+    {
+        mode = 2;
+    }
+
+    // Taster 3 gedrückt
+    else if (!(GPIOA->IDR & (1 << 13)))
+    {
+        mode = 3;
+    }
+
+    // Taster 4 gedrückt
+    else if (!(GPIOA->IDR & (1 << 14)))
+    {
+        mode = 4;
+    }
+
+    // --------------------------------
+    // Timer ist abgelaufen?
+    // --------------------------------
+    if (TIM2->SR & 1)
+    {
+        // Update-Flag löschen
+        TIM2->SR &= ~(1 << 0);
+
+        switch (mode)
+        {
+  // =====================================================
+// Requirement: TASTER_1_FUNCTION
+// Requirement: T1_TIMING
+//
+// @satisfies TASTER_1_FUNCTION
+// @satisfies T1_TIMING
+// =====================================================
+
+            // -------------------------
+            // Modus 1
+            // LED1 blinkt
+            // -------------------------
+            case 1:
+                GPIOC->ODR ^= (1 << 0);      // PC0 umschalten
+                GPIOC->ODR &= ~0x0E;         // PC1-PC3 ausschalten
+               printf("LED1 TOGGLE %lu\r\n", TIM5->CNT);
+
+                break;
+
+// =====================================================
+// Requirement: TASTER_2_FUNCTION
+// Requirement: T2_TIMING
+//
+// @satisfies TASTER_2_FUNCTION
+// @satisfies T2_TIMING
+// =====================================================           
+
+            // -------------------------
+            // Modus 2
+            // LED2 blinkt
+            // -------------------------
+            case 2:
+                GPIOC->ODR ^= (1 << 1);      // PC1 umschalten
+                GPIOC->ODR &= ~0x0D;         // PC0,PC2,PC3 aus
+                printf("LED2 TOGGLE %lu\r\n", TIM5->CNT);
+
+                break;
+
+// =====================================================
+// Requirement: TASTER_3_FUNCTION
+//
+// @satisfies TASTER_3_FUNCTION
+// =====================================================        
+
+            // -------------------------
+            // Modus 3
+            // Alle LEDs blinken
+            // -------------------------
+            case 3:
+                GPIOC->ODR ^= 0x0F;
+                printf("ALL TOGGLE %lu\r\n", TIM5->CNT);
+                break;
+// =====================================================
+// Requirement: TASTER_4_FUNCTION
+//
+// @satisfies TASTER_4_FUNCTION
+// =====================================================
+
+
+            // -------------------------
+            // Modus 4
+            // Alle LEDs dauerhaft an
+            // -------------------------
+            case 4:
+                GPIOC->ODR = 0x0F;
+                printf("ALL ON %lu\r\n", TIM5->CNT);
+                break;
+
+            // -------------------------
+            // Kein Modus gewählt
+            // -------------------------
+            default:
+                GPIOC->ODR = 0x00;
+                break;
+        }
+    }
+}
+  /* USER CODE END 3 */
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 16;
+  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+
+  /* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LD2_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+
+  /* USER CODE END MX_GPIO_Init_2 */
+}
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+#ifdef USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
+
+
+
+====================================================
+GIT-HISTORIE
+====================================================
+
+
+==================================================
+Aktueller Branch
+==================================================
+
+feature/taster
+
+==================================================
+Repository Status
+==================================================
+
+M Core/Src/main.c
+ M agent_llm/__pycache__/config.cpython-314.pyc
+ M agent_llm/__pycache__/llm_client.cpython-314.pyc
+ M agent_llm/__pycache__/prompts.cpython-314.pyc
+ M agent_llm/__pycache__/student_agent.cpython-314.pyc
+ M agent_llm/config.py
+ M agent_llm/llm_client.py
+ M agent_llm/prof_prompts.py
+ M agent_llm/professor_agent.py
+ M agent_llm/prompts.py
+ M test_taster.py
+?? ../../.vscode/
+?? ../../build/
+?? agent_llm/__pycache__/context_loader.cpython-314.pyc
+?? agent_llm/__pycache__/git_reader.cpython-314.pyc
+?? agent_llm/__pycache__/prof_prompts.cpython-314.pyc
+?? agent_llm/__pycache__/professor_agent.cpython-314.pyc
+?? professor_prompt.txt
+?? test_professor.py
+
+==================================================
+Anzahl der Commits
+==================================================
+
+42
+
+==================================================
+Commit-Historie
+==================================================
+
+097a5d9 | 01imane | 2026-08-18 | refactor(student-agent): improve structured test feedback + prof agent
+28c3569 | 01imane | 2026-08-17 | feat(context): integrate Git repository information
+214a713 | 01imane | 2026-08-17 | feat(teacher-agent): add Git repository analysis
+44a2a1d | 01imane | 2026-08-17 | screenschots for the results
+acc065f | 01imane | 2026-08-17 | refactor(teacher-agent): use shared context loader for analysis
+97db3b7 | 01imane | 2026-08-17 | refactor(student-agent): load shared analysis context
+6beeed5 | 01imane | 2026-08-17 | all the infos will be collected by this file
+62a85c6 | 01imane | 2026-08-17 | feat(student-agent): enhance LLM prompt with structured analysis instructions
+61a843c | 01imane | 2026-07-20 | deleted the Mikroprozessor_Vorlesung.sysml, it causes problems with tracibility and modified the satisfies
+563981d | 01imane | 2026-07-20 | delete the old running light project
+
+==================================================
+Letzter Commit
+==================================================
+
+097a5d9 refactor(student-agent): improve structured test feedback + prof agent
+ software/Taster_code/agent_llm/git_analysis.py  |  74 ++++++++++++++
+ software/Taster_code/agent_llm/prof_prompts.py  |  81 +++++++++++++---
+ software/Taster_code/agent_llm/prompts.py       |   5 +
+ software/Taster_code/agent_llm/student_agent.py |   8 ++
+ software/Taster_code/test_taster.py             | 124 +++++++++++++++++-------
+ 5 files changed, 244 insertions(+), 48 deletions(-)
+
+==================================================
+Aktuelle Änderungen (Diff)
+==================================================
+
+Git-Fehler: 'NoneType' object has no attribute 'strip'
+
+
+====================================================
+VORLESUNGSMODELL
+====================================================
+
+package Praktikum_Taster {
+
+    private import Requirements::*;
+    private import Mikroprozessor_Vorlesung::Vorlesung_GPIO::*;
+    private import Mikroprozessor_Vorlesung::Vorlesung_Timer::*;
+
+    doc /*
+        Dieses Paket definiert die Anforderungen für den
+        Praktikumsversuch "Taster und LED-Ansteuerung".
+    */
+
+    // =====================================================
+    // GPIO
+    // =====================================================
+
+    requirement GPIO_CONFIG {
+
+        attribute id = "GPIO_CONFIG";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            PA11–PA14 werden als digitale Eingänge
+            mit Pull-Up konfiguriert.
+
+            PC0–PC3 werden als digitale Ausgänge
+            konfiguriert.
+        */
+
+        derived GPIO_Konfiguration;
+    }
+
+    // =====================================================
+    // Tasterlogik
+    // =====================================================
+
+    requirement TASTER_LOGIC {
+
+        attribute id = "TASTER_LOGIC";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Alle Taster arbeiten als Active-Low-Eingänge.
+            Ein gedrückter Taster liefert den logischen Wert 0.
+        */
+
+        derived Digitale_Eingaenge;
+    }
+
+    // =====================================================
+    // Timer
+    // =====================================================
+
+    requirement TIMER_CONFIGURATION {
+
+        attribute id = "TIMER_CONFIGURATION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            TIM2 wird als periodische Zeitbasis
+            für die LED-Ansteuerung verwendet.
+        */
+
+        derived Timer_Grundlagen;
+    }
+
+    // =====================================================
+    // Funktionale Anforderungen
+    // =====================================================
+
+    requirement TASTER_1_FUNCTION {
+
+        attribute id = "TASTER_1_FUNCTION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Wird Taster PA11 gedrückt,
+            blinkt LED PC0.
+        */
+
+        derived Digitale_Ausgaenge;
+    }
+
+    requirement TASTER_2_FUNCTION {
+
+        attribute id = "TASTER_2_FUNCTION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Wird Taster PA12 gedrückt,
+            blinkt LED PC1.
+        */
+
+        derived Digitale_Ausgaenge;
+    }
+
+    requirement TASTER_3_FUNCTION {
+
+        attribute id = "TASTER_3_FUNCTION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Wird Taster PA13 gedrückt,
+            blinken alle LEDs gleichzeitig.
+        */
+
+        derived Digitale_Ausgaenge;
+    }
+
+    requirement TASTER_4_FUNCTION {
+
+        attribute id = "TASTER_4_FUNCTION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Wird Taster PA14 gedrückt,
+            werden alle LEDs dauerhaft eingeschaltet.
+        */
+
+        derived Digitale_Ausgaenge;
+    }
+
+    // =====================================================
+    // Zeitverhalten
+    // =====================================================
+
+    requirement T1_TIMING {
+
+        attribute id = "T1_TIMING";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            LED1 wird periodisch
+            mit einer Umschaltzeit von 1000 ms betrieben.
+        */
+
+        derived Prescaler_ARR;
+    }
+
+    requirement T2_TIMING {
+
+        attribute id = "T2_TIMING";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            LED2 wird periodisch
+            mit einer Umschaltzeit von 1000 ms betrieben.
+        */
+
+        derived Prescaler_ARR;
+    }
+
+    // =====================================================
+    // Ansicht
+    // =====================================================
+
+    view Anforderungen_Praktikum_Taster {
+
+        doc /*
+            Übersicht aller Anforderungen
+            des Praktikumsversuchs "Taster".
+        */
+    }
+
+}
+
+====================================================
+PRAKTIKUMSMODELL
+====================================================
+
+package Praktikum_Taster {
+
+    private import Requirements::*;
+    private import Mikroprozessor_Vorlesung::Vorlesung_GPIO::*;
+    private import Mikroprozessor_Vorlesung::Vorlesung_Timer::*;
+
+    doc /*
+        Dieses Paket definiert die Anforderungen für den
+        Praktikumsversuch "Taster und LED-Ansteuerung".
+    */
+
+    // =====================================================
+    // GPIO
+    // =====================================================
+
+    requirement GPIO_CONFIG {
+
+        attribute id = "GPIO_CONFIG";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            PA11–PA14 werden als digitale Eingänge
+            mit Pull-Up konfiguriert.
+
+            PC0–PC3 werden als digitale Ausgänge
+            konfiguriert.
+        */
+
+        derived GPIO_Konfiguration;
+    }
+
+    // =====================================================
+    // Tasterlogik
+    // =====================================================
+
+    requirement TASTER_LOGIC {
+
+        attribute id = "TASTER_LOGIC";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Alle Taster arbeiten als Active-Low-Eingänge.
+            Ein gedrückter Taster liefert den logischen Wert 0.
+        */
+
+        derived Digitale_Eingaenge;
+    }
+
+    // =====================================================
+    // Timer
+    // =====================================================
+
+    requirement TIMER_CONFIGURATION {
+
+        attribute id = "TIMER_CONFIGURATION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            TIM2 wird als periodische Zeitbasis
+            für die LED-Ansteuerung verwendet.
+        */
+
+        derived Timer_Grundlagen;
+    }
+
+    // =====================================================
+    // Funktionale Anforderungen
+    // =====================================================
+
+    requirement TASTER_1_FUNCTION {
+
+        attribute id = "TASTER_1_FUNCTION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Wird Taster PA11 gedrückt,
+            blinkt LED PC0.
+        */
+
+        derived Digitale_Ausgaenge;
+    }
+
+    requirement TASTER_2_FUNCTION {
+
+        attribute id = "TASTER_2_FUNCTION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Wird Taster PA12 gedrückt,
+            blinkt LED PC1.
+        */
+
+        derived Digitale_Ausgaenge;
+    }
+
+    requirement TASTER_3_FUNCTION {
+
+        attribute id = "TASTER_3_FUNCTION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Wird Taster PA13 gedrückt,
+            blinken alle LEDs gleichzeitig.
+        */
+
+        derived Digitale_Ausgaenge;
+    }
+
+    requirement TASTER_4_FUNCTION {
+
+        attribute id = "TASTER_4_FUNCTION";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            Wird Taster PA14 gedrückt,
+            werden alle LEDs dauerhaft eingeschaltet.
+        */
+
+        derived Digitale_Ausgaenge;
+    }
+
+    // =====================================================
+    // Zeitverhalten
+    // =====================================================
+
+    requirement T1_TIMING {
+
+        attribute id = "T1_TIMING";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            LED1 wird periodisch
+            mit einer Umschaltzeit von 1000 ms betrieben.
+        */
+
+        derived Prescaler_ARR;
+    }
+
+    requirement T2_TIMING {
+
+        attribute id = "T2_TIMING";
+        attribute requirement_status = "Approved";
+        attribute implementation_status = "Implemented";
+
+        doc /*
+            LED2 wird periodisch
+            mit einer Umschaltzeit von 1000 ms betrieben.
+        */
+
+        derived Prescaler_ARR;
+    }
+
+    // =====================================================
+    // Ansicht
+    // =====================================================
+
+    view Anforderungen_Praktikum_Taster {
+
+        doc /*
+            Übersicht aller Anforderungen
+            des Praktikumsversuchs "Taster".
+        */
+    }
+
+}
+
+====================================================
+AUFGABE
+====================================================
+
+Analysiere die bereitgestellten Informationen gemeinsam.
+
+Nutze dabei insbesondere
+
+- Testergebnisse
+- UART-Ausgabe
+- Hardwareinformationen
+- Traceability Report
+- Programmcode
+- Git-Historie
+- Vorlesungsmodell
+- Praktikumsmodell
+
+Treffe keine Vermutungen,
+die nicht durch diese Informationen gestützt werden.
+
+Falls keine eindeutige Aussage möglich ist,
+weise ausdrücklich darauf hin.
+
+Trenne klar zwischen
+
+- Fakten
+- Interpretation
+
+und kennzeichne Interpretationen entsprechend.
+
+====================================================
+ANTWORTFORMAT
+====================================================
+
+## 1. Zusammenfassung
+
+Beschreibe den aktuellen Entwicklungsstand
+in wenigen Sätzen.
+
+Bewerte außerdem kurz,
+
+- ob der aktuelle Test erfolgreich war,
+- und ob das Requirement erfüllt wurde.
+
+Gib für deine Einschätzung eine Sicherheit an:
+
+- hoch
+- mittel
+- gering
+
+Begründe diese.
+
+----------------------------------------------------
+
+## 2. Bewertung der Requirements
+
+Bewerte alle relevanten Requirements.
+
+Ordne sie ein in
+
+- erfüllt
+- teilweise erfüllt
+- nicht erfüllt
+
+Begründe jede Bewertung
+anhand von
+
+- Testergebnis
+- Programmcode
+- Traceability
+- SysML.
+
+----------------------------------------------------
+
+## 3. Analyse des Entwicklungsprozesses
+
+Analysiere die Git-Historie.
+
+Berücksichtige insbesondere
+
+- Anzahl der Commits
+- Commit-Nachrichten
+- Commit-Struktur
+- wiederholte Änderungen
+- Refactorings
+- Bugfixes
+- Entwicklung des Programmcodes
+
+Beantworte insbesondere
+
+- Welche Dateien wurden häufig geändert?
+
+- Welche Requirements wurden mehrfach überarbeitet?
+
+- Welche Komponenten bereiteten Schwierigkeiten?
+
+- Ist ein systematischer Lernfortschritt erkennbar?
+
+- Zeigen die Commits eher ein planmäßiges Vorgehen
+  oder häufiges Trial-and-Error?
+
+- Welche Themen scheinen sicher beherrscht zu werden?
+
+Begründe jede Aussage.
+
+Gib zusätzlich eine Sicherheit an
+
+- hoch
+- mittel
+- gering.
+
+----------------------------------------------------
+
+## 4. Fachliche Einschätzung
+
+Ordne mögliche Probleme fachlich ein.
+ Mögliche Kategorien:
+- Verständnisproblem
+- Implementierungsfehler
+- Konfigurationsfehler
+- Kommunikationsproblem
+- Hardwareproblem
+
+Nutze dabei ausschließlich
+
+- Testergebnisse
+- Programmcode
+- Traceability
+- Git-Historie
+- SysML
+
+Falls keine Probleme erkennbar sind,
+weise ausdrücklich darauf hin.
+
+----------------------------------------------------
+
+## 5. Bezug zur Vorlesung
+
+Welche Lernziele oder Vorlesungsinhalte
+lassen sich anhand der bereitgestellten Informationen
+als noch unsicher einschätzen?
+
+Falls keine Aussage möglich ist,
+weise ausdrücklich darauf hin.
+
+Begründe jede Empfehlung.
+
+ ----------------------------------------------------
+## 6. Empfehlung für den Dozenten
+
+Empfiehl geeignete Maßnahmen.
+
+Zum Beispiel
+
+- keine weiteren Maßnahmen
+- kurzer Hinweis
+- individuelles Feedback
+- zusätzliche Übung
+- Wiederholung einzelner Vorlesungsthemen
+- Wiederholung des Praktikums
+ 
+Begründe deine Empfehlung
+ausschließlich anhand der bereitgestellten Informationen.
+ ----------------------------------------------------
+## 7. Bewertung des Lernfortschritts
+
+Bewerte den bisherigen Lernfortschritt.
+
+Nutze insbesondere
+
+- Git-Historie
+- Entwicklung des Programmcodes
+- Testergebnisse
+- Traceability
+
+Ordne den Lernfortschritt ein als
+
+- gering
+- moderat
+- gut
+- sehr gut
+
+Begründe deine Entscheidung.
+
+----------------------------------------------------
+
+## 8. Verbesserung des Praktikums
+
+Leite aus den Ergebnissen
+Empfehlungen zur Weiterentwicklung
+des Praktikums ab.
+
+Zum Beispiel
+
+- Welche Themen sollten ausführlicher erklärt werden?
+
+- Welche Requirements bereiten häufig Schwierigkeiten?
+
+- Sollte das Testframework erweitert werden?
+
+- Sollten weitere automatische Tests ergänzt werden?
+
+- Sind zusätzliche Hinweise oder Beispiele sinnvoll?
+
+Begründe deine Vorschläge.
+
+----------------------------------------------------
+
+## 9. Nachvollziehbarkeit der Bewertung
+
+Für jede wesentliche Aussage
+gib an,
+auf welchen Informationen sie basiert.
+
+Verwende ausschließlich
+
+- Testergebnis
+- UART
+- Programmcode
+- Traceability
+- Git-Historie
+- Hardware
+- Vorlesungsmodell
+- Praktikumsmodell
+
+Dadurch soll die Bewertung nachvollziehbar
+und überprüfbar sein.
+
+----------------------------------------------------
+
+## 10. Empfehlung zur Prüfungsbewertung
+
+Gib abschließend eine unverbindliche Empfehlung.
+
+Mögliche Bewertungen:
+
+- bestanden
+- bestanden mit Hinweisen
+- Nachbesserung erforderlich
+- nicht bestanden
+
+Begründe die Empfehlung ausschließlich
+anhand der bereitgestellten Informationen.
+
+Weise ausdrücklich darauf hin,
+dass diese Empfehlung
+keine offizielle Bewertung ersetzt.
+
+====================================================
+WICHTIGE REGELN
+====================================================
+
+ - Antworte ausschließlich auf Deutsch.
+- Nutze ausschließlich die bereitgestellten Informationen.
+- Erfinde keine Informationen.
+- Trenne Fakten und Interpretation.
+- Begründe jede wesentliche Aussage.
+- Gib für wesentliche Einschätzungen eine Sicherheit
+  (hoch, mittel oder gering) an.
+- Schreibe keinen Programmcode.
+- Gib keine fertigen Lösungen aus.
+- Bewerte objektiv und nachvollziehbar.

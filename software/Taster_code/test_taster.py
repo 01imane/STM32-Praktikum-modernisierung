@@ -2,12 +2,17 @@ import serial
 import sys
 import os
 import time
+import inspect
 
+
+print(">>> Neue professor_agent.py geladen <<<")
 # AI-Agent importieren
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #war für den ersten Einsatz mit .py agent
 # from agent.ai_agent import analyze
 from agent_llm.student_agent import student_agent
+
+from agent_llm.professor_agent import professor_agent
 # -----------------------------
 # Einstellungen
 # -----------------------------
@@ -117,90 +122,7 @@ while True:
     # -----------------------------
     # Falscher Test?
     # -----------------------------
-    if line.startswith("LED1 TOGGLE") and expected_message != "LED1 TOGGLE":
-        print("\n❌ Falscher Test!")
-        print("Erwartet:", expected_message)
-        print("Empfangen: LED1 TOGGLE")
-        student_agent(
-            test_name=expected_message,
-            expected=EXPECTED_TIME,
-            average=0,
-            tolerance=TOLERANCE,
-            requirement=requirement,
-            uart_output=f"""
-              Erwartet:
-              {expected_message}
-
-              Empfangen:
-              {line}
-            """
-)
-        ser.close()
-        sys.exit()
-
-    if line.startswith("LED2 TOGGLE") and expected_message != "LED2 TOGGLE":
-        print("\n❌ Falscher Test!")
-        print("Erwartet:", expected_message)
-        print("Empfangen: LED2 TOGGLE")
-        student_agent(
-            test_name=expected_message,
-            expected=EXPECTED_TIME,
-            average=0,
-            tolerance=TOLERANCE,
-            requirement=requirement,
-            uart_output=f"""
-              Erwartet:
-              {expected_message}
-
-              Empfangen:
-              {line}
-            """
-)
-        ser.close()
-        sys.exit()
-
-    if line.startswith("ALL TOGGLE") and expected_message != "ALL TOGGLE":
-        print("\n❌ Falscher Test!")
-        print("Erwartet:", expected_message)
-        print("Empfangen: ALL TOGGLE")
-        student_agent(
-            test_name=expected_message,
-            expected=EXPECTED_TIME,
-            average=0,
-            tolerance=TOLERANCE,
-            requirement=requirement,
-            uart_output=f"""
-              Erwartet:
-              {expected_message}
-
-              Empfangen:
-              {line}
-            """
-)
-        ser.close()
-        sys.exit()
-
-    if line.startswith("ALL ON") and expected_message != "ALL ON":
-        print("\n❌ Falscher Test!")
-        print("Erwartet:", expected_message)
-        print("Empfangen: ALL ON")
-        student_agent(
-            test_name=expected_message,
-            expected=EXPECTED_TIME,
-            average=0,
-            tolerance=TOLERANCE,
-            requirement=requirement,
-            uart_output=f"""
-              Erwartet:
-              {expected_message}
-
-              Empfangen:
-              {line}
-            """
-)
-        ser.close()
-        sys.exit()
-
+  
     # -----------------------------
     # Richtige Nachricht
     # -----------------------------
@@ -229,7 +151,7 @@ while True:
                 average=0,
                 tolerance=0,
                 requirement=requirement,
-                uart_output="ALL ON erfolgreich."
+                uart_output="ALL ON ."
     )
 
             ser.close()
@@ -268,15 +190,7 @@ for i in range(len(timestamps)-1):
 
     print(f"{i+1}. {dt} ms")
 
-    if abs(dt - EXPECTED_TIME) <= TOLERANCE:
-
-      print("   ✅ Innerhalb der Toleranz")
-
-    else:
-
-      passed = False
-
-      print("   ⚠️ Außerhalb der Toleranz")
+    
 
 average = sum(diffs) / len(diffs)
 
@@ -287,18 +201,6 @@ print("--------------------------------")
 
 # Ergebnis
 # -----------------------------
-if passed:
-
-    print("\n==============================")
-    print("✅ TEST BESTANDEN")
-   
-    print("==============================")
-
-else:
-
-    print("\n==============================")
-    print("❌ TEST NICHT BESTANDEN")
-    print("==============================")
 
 
 student_agent(
@@ -332,3 +234,38 @@ student_agent(
     """
 
    )
+
+professor_agent(
+    student="Imane",
+    
+    test_name=expected_message,
+
+    expected=EXPECTED_TIME,
+
+    measured=average,
+
+    tolerance=TOLERANCE,
+
+    requirement=requirement,
+
+    result=passed,
+
+    uart_output=f"""
+Messwerte:
+
+{diffs}
+
+Durchschnitt:
+
+{average:.1f} ms
+
+Sollwert:
+
+{EXPECTED_TIME} ms
+
+Toleranz:
+
+±{TOLERANCE} ms
+"""
+)
+print(inspect.signature(professor_agent))

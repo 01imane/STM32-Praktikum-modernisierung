@@ -92,7 +92,24 @@ PROGRAMMCODE (main.c)
 AUFGABE
 ====================================================
 
-Analysiere alle Informationen gemeinsam.
+
+Analysiere die bereitgestellten Informationen in folgender Reihenfolge:
+
+1. Testergebnis und Messwerte
+2. UART-Ausgabe
+3. Zugehöriges Requirement
+4. Programmcode
+5. SysML-Modelle
+
+Nutze den Programmcode ausschließlich, um die Ursache des
+beobachteten Testergebnisses zu erklären.
+
+Gehe niemals davon aus, dass ein Fehler existiert,
+wenn der Test erfolgreich war.
+
+Falls Messwerte und Programmcode widersprüchlich sind,
+weise ausdrücklich auf diesen Widerspruch hin und
+treffe keine eindeutige Entscheidung.  
 
 Nutze
 
@@ -136,11 +153,17 @@ Beziehe dich auf
 
 ----------------------------------------------------
 
-## 3. Wahrscheinlich fehlerhafte Register
+## 3. Registeranalyse
 
-Liste die Register.
+Falls der Test erfolgreich war:
 
-Erkläre kurz ihre Aufgabe.
+- Bestätige, dass keine offensichtlichen Fehler in den
+  relevanten Registern erkennbar sind.
+
+Falls der Test fehlgeschlagen ist:
+
+- Nenne nur Register, für die konkrete Hinweise auf einen
+  Fehler im Programmcode oder in den Messdaten vorliegen.
 
 ----------------------------------------------------
 
@@ -151,6 +174,14 @@ Nenne
 - Funktion
 - Schleife
 - Initialisierung
+Beziehe dich möglichst auf
+
+- Funktionen
+- Initialisierung
+- Registerzugriffe
+- Konfigurationsabschnitte
+
+im bereitgestellten Programmcode.
 
 falls möglich.
 
