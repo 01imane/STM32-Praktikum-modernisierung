@@ -11,13 +11,23 @@ def professor_agent(
         requirement,
         expected,
         measured,
+        tolerance,
         result,
         uart_output
 
 ):
     """
-    KI-Agent für den Dozenten.
-    Analysiert den Entwicklungsprozess eines Studierenden.
+    KI-Agent für Lehrende.
+
+    Analysiert nicht nur das aktuelle Testergebnis,
+    sondern den gesamten Entwicklungsprozess anhand von
+
+    - main.c
+    - SysML
+    - Traceability
+    - Git-Historie
+    - Hardware
+    - UART
     """
 
     # SysML-Modelle laden
@@ -39,11 +49,14 @@ def professor_agent(
 
         measured=measured,
 
+        tolerance=tolerance,
+
         result=result,
 
         traceability=context["traceability"],
 
         uart_output=uart_output,
+        
 
         lecture_model=lecture_model,
 
@@ -58,10 +71,19 @@ def professor_agent(
     )
 
     # LLM aufrufen
+    print("=" * 80) 
+    print("PROMPT-LÄNGE:", len(prompt))
+    print("=" * 80)
     answer = ask_llm(prompt)
+   
+    with open("professor_prompt.txt", "w", encoding="utf-8") as f:
+        f.write(prompt)
+
+    print("Prompt gespeichert.")
 
     print("\n========== PROFESSOR FEEDBACK ==========\n")
     print(answer)
     print("\n========================================\n")
 
+    
     return answer

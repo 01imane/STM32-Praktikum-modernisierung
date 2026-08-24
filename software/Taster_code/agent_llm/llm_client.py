@@ -25,11 +25,19 @@ def ask_llm(prompt):
             }
         ]
     )
+    print("\n==============================")
+    print("MODELL:", MODEL)
+    print("Finish:", response.choices[0].finish_reason)
+    print("==============================")
 
-    print(response)
-
-    if response.choices is None:
-        print("Keine choices erhalten!")
+    if not response.choices:
+        print("Keine Antwort erhalten!")
         return None
 
-    return response.choices[0].message.content
+    answer = response.choices[0].message.content
+
+    print("\nAntwort:")
+
+
+    return answer
+    
