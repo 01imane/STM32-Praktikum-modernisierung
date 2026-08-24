@@ -203,11 +203,11 @@ GPIOA->PUPDR |=  (0x55 << 22); // Pull-Up
     }
 
     // Taster 2 gedrückt
-    /*else if (!(GPIOA->IDR & (1 << 12)))
+    else if (!(GPIOA->IDR & (1 << 12)))
     {
         mode = 2;
     }
-    */
+
     // Taster 3 gedrückt
     else if (!(GPIOA->IDR & (1 << 13)))
     {
