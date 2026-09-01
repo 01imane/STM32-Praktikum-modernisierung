@@ -135,97 +135,63 @@ ANTWORTFORMAT
 ## 1. Testergebnis
 
 - Bestanden oder Nicht bestanden
+- Nenne das betroffene Requirement.
 
 ----------------------------------------------------
 
-## 2. Analyse
+## 2. Interpretation
 
-Warum ist der Test fehlgeschlagen?
+Analysiere das Testergebnis anhand der bereitgestellten Informationen.
 
-Welche Information deutet darauf hin?
+Nutze dabei folgende Priorität:
 
-Beziehe dich auf
+1. Testergebnis
+2. UART-Ausgabe
+3. Requirement
+4. Programmcode
+5. SysML
 
-- Messwerte
-- UART
-- Code
-- Requirement
+Beschreibe in wenigen Sätzen:
 
-----------------------------------------------------
+- Warum der Test bestanden oder nicht bestanden wurde.
+- Welche Informationen diese Aussage unterstützen.
+- Falls die Ursache nicht eindeutig ist, schreibe:
+  "Die Ursache kann anhand der vorhandenen Informationen nicht eindeutig bestimmt werden."
 
-## 3. Registeranalyse
-
-Falls der Test erfolgreich war:
-
-- Bestätige, dass keine offensichtlichen Fehler in den
-  relevanten Registern erkennbar sind.
-
-Falls der Test fehlgeschlagen ist:
-
-- Nenne nur Register, für die konkrete Hinweise auf einen
-  Fehler im Programmcode oder in den Messdaten vorliegen.
+Keine Registeranalyse.
+Keine Berechnungen.
+Keine Codebeispiele.
+Keine fertigen Lösungen.
 
 ----------------------------------------------------
 
-## 4. Wahrscheinlich fehlerhafte Programmstelle
+## 3. Hinweise
 
-Nenne
+Gib maximal vier kurze Hinweise.
 
-- Funktion
-- Schleife
-- Initialisierung
-Beziehe dich möglichst auf
+Zum Beispiel:
 
-- Funktionen
-- Initialisierung
-- Registerzugriffe
-- Konfigurationsabschnitte
+- Prüfe die Timerkonfiguration.
+- Vergleiche den erwarteten und den ausgeführten Test.
+- Prüfe die Tasterzuordnung.
+- Wiederhole die Vorlesung zum entsprechenden Thema.
 
-im bereitgestellten Programmcode.
+Gib keine vollständige Lösung aus.
 
-falls möglich.
+====================================================
+WICHTIGE REGELN
+====================================================
 
-----------------------------------------------------
-
-## 5. Zugehörige Requirement(s)
-
-Welche Requirement(s) sind verletzt?
-
-----------------------------------------------------
-
-## 6. Zugehörige Vorlesung
-
-Welche Vorlesung sollte der Student wiederholen?
-
-Begründe warum.
-
-----------------------------------------------------
-
-## 7. Verbesserungsvorschläge
-
-Beschreibe konkrete Änderungen.
-
-Nicht nur
-
-"Timer prüfen"
-
-sondern z.B.
-
-- PSC berechnen
-- ARR berechnen
-- GPIO Clock aktivieren
-- Pull-Up aktivieren
-- Update Event auslösen
-
-----------------------------------------------------
-
-## 8. Lernhinweis
-
-Erkläre dem Studenten kurz das zugrunde liegende
-Mikrocontroller-Konzept.
-
-Maximal 150 Wörter.
-
+- Antworte ausschließlich auf Deutsch.
+- Schreibe maximal 150 Wörter.
+- Nutze ausschließlich die bereitgestellten Informationen.
+- Erfinde keine technischen Ursachen.
+- Falls Informationen fehlen, weise darauf hin.
+- Gib keine Registerwerte aus.
+- Gib keine Codebeispiele aus.
+- Gib keine fertige Lösung aus.
+- Konzentriere dich auf den wahrscheinlichsten Fehler.
+- Ziel ist es, den Studenten zur eigenen Fehlersuche anzuleiten.
 """
 
     return prompt

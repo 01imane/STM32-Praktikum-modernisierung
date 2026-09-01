@@ -1,0 +1,19 @@
+## 1. Testergebnis
+
+- **Bestanden**
+- Betroffenes Requirement: **TASTER_1_FUNCTION** (LED1 muss mit einer Umschaltzeit von 1000 ms blinken).
+
+----------------------------------------------------
+
+## 2. Interpretation
+
+Der Test wurde bestanden, da die gemessenen Umschaltzeiten (1000 ms ± 0 ms) innerhalb der Toleranz von ±20 ms liegen. Die UART-Ausgabe zeigt regelmäßige „LED1 TOGGLE“-Nachrichten, die mit dem Timer-Interrupt übereinstimmen, der GPIOC ODR Bit 0 umschaltet, wenn der Taster PA11 gedrückt wird (Modus 1). Das SysML-Modell verknüpft TASTER_1_FUNCTION mit der LED1-Umschaltung, und der Traceability-Bericht bestätigt, dass die Anforderung implementiert ist. Alle Hinweise deuten auf eine korrekte Timer-/GPIO-Konfiguration und Tasterbehandlung hin.
+
+----------------------------------------------------
+
+## 3. Hinweise
+
+- Überprüfe die Timer-Peripherie (TIM2) auf die korrekte PSC-/ARR-Einstellung.
+- Stelle sicher, dass der Taster-Pull-Up und die Active-Low-Logik korrekt sind.
+- Überprüfe den Interrupt-Service-Routine-Code für den Modus 1.
+- Vergleiche die UART-Timestamps mit dem erwarteten periodischen Verhalten.

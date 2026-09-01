@@ -85,5 +85,7 @@ def professor_agent(
     print(answer)
     print("\n========================================\n")
 
+    with open("professor_feedback.txt", "a", encoding="utf-8") as f:
+         f.write(answer)
     
     return answer

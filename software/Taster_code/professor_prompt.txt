@@ -326,7 +326,7 @@ TIM2->CR1 |= (1 << 0);
 // =====================================================
 
 GPIOC->MODER &= ~(0xFF);   // reset PC0–PC3
-//GPIOC->MODER |=  (0x55);   // output
+GPIOC->MODER |=  (0x55);   // output
 
 // ----------------------
 // Taster PA11–PA14 Input
@@ -640,36 +640,30 @@ feature/taster
 Repository Status
 ==================================================
 
-M Core/Src/main.c
- M agent_llm/__pycache__/config.cpython-314.pyc
- M agent_llm/__pycache__/llm_client.cpython-314.pyc
+M agent_llm/__pycache__/professor_agent.cpython-314.pyc
  M agent_llm/__pycache__/prompts.cpython-314.pyc
  M agent_llm/__pycache__/student_agent.cpython-314.pyc
- M agent_llm/config.py
- M agent_llm/llm_client.py
- M agent_llm/prof_prompts.py
  M agent_llm/professor_agent.py
  M agent_llm/prompts.py
+ M agent_llm/student_agent.py
+ M professor_prompt.txt
  M test_taster.py
 ?? ../../.vscode/
 ?? ../../build/
-?? agent_llm/__pycache__/context_loader.cpython-314.pyc
-?? agent_llm/__pycache__/git_reader.cpython-314.pyc
-?? agent_llm/__pycache__/prof_prompts.cpython-314.pyc
-?? agent_llm/__pycache__/professor_agent.cpython-314.pyc
-?? professor_prompt.txt
-?? test_professor.py
+?? student_feedback.txt
 
 ==================================================
 Anzahl der Commits
 ==================================================
 
-42
+44
 
 ==================================================
 Commit-Historie
 ==================================================
 
+71454cb | 01imane | 2026-08-25 | delete the comment
+f1a85d2 | 01imane | 2026-08-25 | Implement AI-based student and professor agents with UART test integration
 097a5d9 | 01imane | 2026-08-18 | refactor(student-agent): improve structured test feedback + prof agent
 28c3569 | 01imane | 2026-08-17 | feat(context): integrate Git repository information
 214a713 | 01imane | 2026-08-17 | feat(teacher-agent): add Git repository analysis
@@ -678,26 +672,539 @@ acc065f | 01imane | 2026-08-17 | refactor(teacher-agent): use shared context loa
 97db3b7 | 01imane | 2026-08-17 | refactor(student-agent): load shared analysis context
 6beeed5 | 01imane | 2026-08-17 | all the infos will be collected by this file
 62a85c6 | 01imane | 2026-08-17 | feat(student-agent): enhance LLM prompt with structured analysis instructions
-61a843c | 01imane | 2026-07-20 | deleted the Mikroprozessor_Vorlesung.sysml, it causes problems with tracibility and modified the satisfies
-563981d | 01imane | 2026-07-20 | delete the old running light project
 
 ==================================================
 Letzter Commit
 ==================================================
 
-097a5d9 refactor(student-agent): improve structured test feedback + prof agent
- software/Taster_code/agent_llm/git_analysis.py  |  74 ++++++++++++++
- software/Taster_code/agent_llm/prof_prompts.py  |  81 +++++++++++++---
- software/Taster_code/agent_llm/prompts.py       |   5 +
- software/Taster_code/agent_llm/student_agent.py |   8 ++
- software/Taster_code/test_taster.py             | 124 +++++++++++++++++-------
- 5 files changed, 244 insertions(+), 48 deletions(-)
+71454cb delete the comment
+ software/Taster_code/Core/Src/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 ==================================================
 Aktuelle Änderungen (Diff)
 ==================================================
 
-Git-Fehler: 'NoneType' object has no attribute 'strip'
+diff --git a/software/Taster_code/agent_llm/__pycache__/professor_agent.cpython-314.pyc b/software/Taster_code/agent_llm/__pycache__/professor_agent.cpython-314.pyc
+index fe06812..ccdded8 100644
+Binary files a/software/Taster_code/agent_llm/__pycache__/professor_agent.cpython-314.pyc and b/software/Taster_code/agent_llm/__pycache__/professor_agent.cpython-314.pyc differ
+diff --git a/software/Taster_code/agent_llm/__pycache__/prompts.cpython-314.pyc b/software/Taster_code/agent_llm/__pycache__/prompts.cpython-314.pyc
+index 2920f76..039b5b8 100644
+Binary files a/software/Taster_code/agent_llm/__pycache__/prompts.cpython-314.pyc and b/software/Taster_code/agent_llm/__pycache__/prompts.cpython-314.pyc differ
+diff --git a/software/Taster_code/agent_llm/__pycache__/student_agent.cpython-314.pyc b/software/Taster_code/agent_llm/__pycache__/student_agent.cpython-314.pyc
+index e829374..73648f6 100644
+Binary files a/software/Taster_code/agent_llm/__pycache__/student_agent.cpython-314.pyc and b/software/Taster_code/agent_llm/__pycache__/student_agent.cpython-314.pyc differ
+diff --git a/software/Taster_code/agent_llm/professor_agent.py b/software/Taster_code/agent_llm/professor_agent.py
+index d332bbc..5b2741c 100644
+--- a/software/Taster_code/agent_llm/professor_agent.py
++++ b/software/Taster_code/agent_llm/professor_agent.py
+@@ -85,5 +85,7 @@ def professor_agent(
+     print(answer)
+     print("\n========================================\n")
+ 
++    with open("professor_feedback.txt", "w", encoding="utf-8") as f:
++         f.write(answer)
+     
+     return answer
+\ No newline at end of file
+diff --git a/software/Taster_code/agent_llm/prompts.py b/software/Taster_code/agent_llm/prompts.py
+index 0130cf5..8f07995 100644
+--- a/software/Taster_code/agent_llm/prompts.py
++++ b/software/Taster_code/agent_llm/prompts.py
+@@ -135,97 +135,63 @@ ANTWORTFORMAT
+ ## 1. Testergebnis
+ 
+ - Bestanden oder Nicht bestanden
++- Nenne das betroffene Requirement.
+ 
+ ----------------------------------------------------
+ 
+-## 2. Analyse
++## 2. Interpretation
+ 
+-Warum ist der Test fehlgeschlagen?
++Analysiere das Testergebnis anhand der bereitgestellten Informationen.
+ 
+-Welche Information deutet darauf hin?
++Nutze dabei folgende PrioritÃ¤t:
+ 
+-Beziehe dich auf
+-
+-- Messwerte
+-- UART
+-- Code
+-- Requirement
+-
+-----------------------------------------------------
+-
+-## 3. Registeranalyse
+-
+-Falls der Test erfolgreich war:
+-
+-- BestÃ¤tige, dass keine offensichtlichen Fehler in den
+-  relevanten Registern erkennbar sind.
+-
+-Falls der Test fehlgeschlagen ist:
+-
+-- Nenne nur Register, fÃ¼r die konkrete Hinweise auf einen
+-  Fehler im Programmcode oder in den Messdaten vorliegen.
+-
+-----------------------------------------------------
+-
+-## 4. Wahrscheinlich fehlerhafte Programmstelle
+-
+-Nenne
+-
+-- Funktion
+-- Schleife
+-- Initialisierung
+-Beziehe dich mÃ¶glichst auf
+-
+-- Funktionen
+-- Initialisierung
+-- Registerzugriffe
+-- Konfigurationsabschnitte
+-
+-im bereitgestellten Programmcode.
+-
+-falls mÃ¶glich.
+-
+-----------------------------------------------------
+-
+-## 5. ZugehÃ¶rige Requirement(s)
+-
+-Welche Requirement(s) sind verletzt?
+-
+-----------------------------------------------------
++1. Testergebnis
++2. UART-Ausgabe
++3. Requirement
++4. Programmcode
++5. SysML
+ 
+-## 6. ZugehÃ¶rige Vorlesung
++Beschreibe in wenigen SÃ¤tzen:
+ 
+-Welche Vorlesung sollte der Student wiederholen?
++- Warum der Test bestanden oder nicht bestanden wurde.
++- Welche Informationen diese Aussage unterstÃ¼tzen.
++- Falls die Ursache nicht eindeutig ist, schreibe:
++  "Die Ursache kann anhand der vorhandenen Informationen nicht eindeutig bestimmt werden."
+ 
+-BegrÃ¼nde warum.
++Keine Registeranalyse.
++Keine Berechnungen.
++Keine Codebeispiele.
++Keine fertigen LÃ¶sungen.
+ 
+ ----------------------------------------------------
+ 
+-## 7. VerbesserungsvorschlÃ¤ge
+-
+-Beschreibe konkrete Ã„nderungen.
+-
+-Nicht nur
+-
+-"Timer prÃ¼fen"
++## 3. Hinweise
+ 
+-sondern z.B.
++Gib maximal vier kurze Hinweise.
+ 
+-- PSC berechnen
+-- ARR berechnen
+-- GPIO Clock aktivieren
+-- Pull-Up aktivieren
+-- Update Event auslÃ¶sen
++Zum Beispiel:
+ 
+-----------------------------------------------------
+-
+-## 8. Lernhinweis
++- PrÃ¼fe die Timerkonfiguration.
++- Vergleiche den erwarteten und den ausgefÃ¼hrten Test.
++- PrÃ¼fe die Tasterzuordnung.
++- Wiederhole die Vorlesung zum entsprechenden Thema.
+ 
+-ErklÃ¤re dem Studenten kurz das zugrunde liegende
+-Mikrocontroller-Konzept.
++Gib keine vollstÃ¤ndige LÃ¶sung aus.
+ 
+-Maximal 150 WÃ¶rter.
++====================================================
++WICHTIGE REGELN
++====================================================
+ 
++- Antworte ausschlieÃŸlich auf Deutsch.
++- Schreibe maximal 150 WÃ¶rter.
++- Nutze ausschlieÃŸlich die bereitgestellten Informationen.
++- Erfinde keine technischen Ursachen.
++- Falls Informationen fehlen, weise darauf hin.
++- Gib keine Registerwerte aus.
++- Gib keine Codebeispiele aus.
++- Gib keine fertige LÃ¶sung aus.
++- Konzentriere dich auf den wahrscheinlichsten Fehler.
++- Ziel ist es, den Studenten zur eigenen Fehlersuche anzuleiten.
+ """
+ 
+     return prompt
+\ No newline at end of file
+diff --git a/software/Taster_code/agent_llm/student_agent.py b/software/Taster_code/agent_llm/student_agent.py
+index 32b9c9b..07942d8 100644
+--- a/software/Taster_code/agent_llm/student_agent.py
++++ b/software/Taster_code/agent_llm/student_agent.py
+@@ -47,4 +47,7 @@ def student_agent(
+     print(answer)
+     print("\n===============================\n")
+ 
++    with open("student_feedback.txt", "w", encoding="utf-8") as f:
++         f.write(answer)
++
+     return answer
+\ No newline at end of file
+diff --git a/software/Taster_code/professor_prompt.txt b/software/Taster_code/professor_prompt.txt
+index 0b15767..64d19d4 100644
+--- a/software/Taster_code/professor_prompt.txt
++++ b/software/Taster_code/professor_prompt.txt
+@@ -326,7 +326,7 @@ TIM2->CR1 |= (1 << 0);
+ // =====================================================
+ 
+ GPIOC->MODER &= ~(0xFF);   // reset PC0â€“PC3
+-//GPIOC->MODER |=  (0x55);   // output
++GPIOC->MODER |=  (0x55);   // output
+ 
+ // ----------------------
+ // Taster PA11â€“PA14 Input
+@@ -640,36 +640,24 @@ feature/taster
+ Repository Status
+ ==================================================
+ 
+-M Core/Src/main.c
+- M agent_llm/__pycache__/config.cpython-314.pyc
+- M agent_llm/__pycache__/llm_client.cpython-314.pyc
+- M agent_llm/__pycache__/prompts.cpython-314.pyc
+- M agent_llm/__pycache__/student_agent.cpython-314.pyc
+- M agent_llm/config.py
+- M agent_llm/llm_client.py
+- M agent_llm/prof_prompts.py
+- M agent_llm/professor_agent.py
++M agent_llm/__pycache__/prompts.cpython-314.pyc
+  M agent_llm/prompts.py
+  M test_taster.py
+ ?? ../../.vscode/
+ ?? ../../build/
+-?? agent_llm/__pycache__/context_loader.cpython-314.pyc
+-?? agent_llm/__pycache__/git_reader.cpython-314.pyc
+-?? agent_llm/__pycache__/prof_prompts.cpython-314.pyc
+-?? agent_llm/__pycache__/professor_agent.cpython-314.pyc
+-?? professor_prompt.txt
+-?? test_professor.py
+ 
+ ==================================================
+ Anzahl der Commits
+ ==================================================
+ 
+-42
++44
+ 
+ ==================================================
+ Commit-Historie
+ ==================================================
+ 
++71454cb | 01imane | 2026-08-25 | delete the comment
++f1a85d2 | 01imane | 2026-08-25 | Implement AI-based student and professor agents with UART test integration
+ 097a5d9 | 01imane | 2026-08-18 | refactor(student-agent): improve structured test feedback + prof agent
+ 28c3569 | 01imane | 2026-08-17 | feat(context): integrate Git repository information
+ 214a713 | 01imane | 2026-08-17 | feat(teacher-agent): add Git repository analysis
+@@ -678,26 +666,221 @@ acc065f | 01imane | 2026-08-17 | refactor(teacher-agent): use shared context loa
+ 97db3b7 | 01imane | 2026-08-17 | refactor(student-agent): load shared analysis context
+ 6beeed5 | 01imane | 2026-08-17 | all the infos will be collected by this file
+ 62a85c6 | 01imane | 2026-08-17 | feat(student-agent): enhance LLM prompt with structured analysis instructions
+-61a843c | 01imane | 2026-07-20 | deleted the Mikroprozessor_Vorlesung.sysml, it causes problems with tracibility and modified the satisfies
+-563981d | 01imane | 2026-07-20 | delete the old running light project
+ 
+ ==================================================
+ Letzter Commit
+ ==================================================
+ 
+-097a5d9 refactor(student-agent): improve structured test feedback + prof agent
+- software/Taster_code/agent_llm/git_analysis.py  |  74 ++++++++++++++
+- software/Taster_code/agent_llm/prof_prompts.py  |  81 +++++++++++++---
+- software/Taster_code/agent_llm/prompts.py       |   5 +
+- software/Taster_code/agent_llm/student_agent.py |   8 ++
+- software/Taster_code/test_taster.py             | 124 +++++++++++++++++-------
+- 5 files changed, 244 insertions(+), 48 deletions(-)
++71454cb delete the comment
++ software/Taster_code/Core/Src/main.c | 4 ++--
++ 1 file changed, 2 insertions(+), 2 deletions(-)
+ 
+ ==================================================
+ Aktuelle Ã„nderungen (Diff)
+ ==================================================
+ 
+-Git-Fehler: 'NoneType' object has no attribute 'strip'
++diff --git a/software/Taster_code/agent_llm/__pycache__/prompts.cpython-314.pyc b/software/Taster_code/agent_llm/__pycache__/prompts.cpython-314.pyc
++index 2920f76..039b5b8 100644
++Binary files a/software/Taster_code/agent_llm/__pycache__/prompts.cpython-314.pyc and b/software/Taster_code/agent_llm/__pycache__/prompts.cpython-314.pyc differ
++diff --git a/software/Taster_code/agent_llm/prompts.py b/software/Taster_code/agent_llm/prompts.py
++index 0130cf5..8f07995 100644
++--- a/software/Taster_code/agent_llm/prompts.py
+++++ b/software/Taster_code/agent_llm/prompts.py
++@@ -135,97 +135,63 @@ ANTWORTFORMAT
++ ## 1. Testergebnis
++ 
++ - Bestanden oder Nicht bestanden
+++- Nenne das betroffene Requirement.
++ 
++ ----------------------------------------------------
++ 
++-## 2. Analyse
+++## 2. Interpretation
++ 
++-Warum ist der Test fehlgeschlagen?
+++Analysiere das Testergebnis anhand der bereitgestellten Informationen.
++ 
++-Welche Information deutet darauf hin?
+++Nutze dabei folgende PrioritÃƒÂ¤t:
++ 
++-Beziehe dich auf
++-
++-- Messwerte
++-- UART
++-- Code
++-- Requirement
++-
++-----------------------------------------------------
++-
++-## 3. Registeranalyse
++-
++-Falls der Test erfolgreich war:
++-
++-- BestÃƒÂ¤tige, dass keine offensichtlichen Fehler in den
++-  relevanten Registern erkennbar sind.
++-
++-Falls der Test fehlgeschlagen ist:
++-
++-- Nenne nur Register, fÃƒÂ¼r die konkrete Hinweise auf einen
++-  Fehler im Programmcode oder in den Messdaten vorliegen.
++-
++-----------------------------------------------------
++-
++-## 4. Wahrscheinlich fehlerhafte Programmstelle
++-
++-Nenne
++-
++-- Funktion
++-- Schleife
++-- Initialisierung
++-Beziehe dich mÃƒÂ¶glichst auf
++-
++-- Funktionen
++-- Initialisierung
++-- Registerzugriffe
++-- Konfigurationsabschnitte
++-
++-im bereitgestellten Programmcode.
++-
++-falls mÃƒÂ¶glich.
++-
++-----------------------------------------------------
++-
++-## 5. ZugehÃƒÂ¶rige Requirement(s)
++-
++-Welche Requirement(s) sind verletzt?
++-
++-----------------------------------------------------
+++1. Testergebnis
+++2. UART-Ausgabe
+++3. Requirement
+++4. Programmcode
+++5. SysML
++ 
++-## 6. ZugehÃƒÂ¶rige Vorlesung
+++Beschreibe in wenigen SÃƒÂ¤tzen:
++ 
++-Welche Vorlesung sollte der Student wiederholen?
+++- Warum der Test bestanden oder nicht bestanden wurde.
+++- Welche Informationen diese Aussage unterstÃƒÂ¼tzen.
+++- Falls die Ursache nicht eindeutig ist, schreibe:
+++  "Die Ursache kann anhand der vorhandenen Informationen nicht eindeutig bestimmt werden."
++ 
++-BegrÃƒÂ¼nde warum.
+++Keine Registeranalyse.
+++Keine Berechnungen.
+++Keine Codebeispiele.
+++Keine fertigen LÃƒÂ¶sungen.
++ 
++ ----------------------------------------------------
++ 
++-## 7. VerbesserungsvorschlÃƒÂ¤ge
++-
++-Beschreibe konkrete Ãƒâ€žnderungen.
++-
++-Nicht nur
++-
++-"Timer prÃƒÂ¼fen"
+++## 3. Hinweise
++ 
++-sondern z.B.
+++Gib maximal vier kurze Hinweise.
++ 
++-- PSC berechnen
++-- ARR berechnen
++-- GPIO Clock aktivieren
++-- Pull-Up aktivieren
++-- Update Event auslÃƒÂ¶sen
+++Zum Beispiel:
++ 
++-----------------------------------------------------
++-
++-## 8. Lernhinweis
+++- PrÃƒÂ¼fe die Timerkonfiguration.
+++- Vergleiche den erwarteten und den ausgefÃƒÂ¼hrten Test.
+++- PrÃƒÂ¼fe die Tasterzuordnung.
+++- Wiederhole die Vorlesung zum entsprechenden Thema.
++ 
++-ErklÃƒÂ¤re dem Studenten kurz das zugrunde liegende
++-Mikrocontroller-Konzept.
+++Gib keine vollstÃƒÂ¤ndige LÃƒÂ¶sung aus.
++ 
++-Maximal 150 WÃƒÂ¶rter.
+++====================================================
+++WICHTIGE REGELN
+++====================================================
++ 
+++- Antworte ausschlieÃƒÅ¸lich auf Deutsch.
+++- Schreibe maximal 150 WÃƒÂ¶rter.
+++- Nutze ausschlieÃƒÅ¸lich die bereitgestellten Informationen.
+++- Erfinde keine technischen Ursachen.
+++- Falls Informationen fehlen, weise darauf hin.
+++- Gib keine Registerwerte aus.
+++- Gib keine Codebeispiele aus.
+++- Gib keine fertige LÃƒÂ¶sung aus.
+++- Konzentriere dich auf den wahrscheinlichsten Fehler.
+++- Ziel ist es, den Studenten zur eigenen Fehlersuche anzuleiten.
++ """
++ 
++     return prompt
++\ No newline at end of file
++diff --git a/software/Taster_code/test_taster.py b/software/Taster_code/test_taster.py
++index 7732e15..36da874 100644
++--- a/software/Taster_code/test_taster.py
+++++ b/software/Taster_code/test_taster.py
++@@ -5,7 +5,7 @@ import time
++ import inspect
++ 
++ 
++-print(">>> Neue professor_agent.py geladen <<<")
+++
++ # AI-Agent importieren
++ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
++ #war fÃƒÂ¼r den ersten Einsatz mit .py agent
++@@ -129,7 +129,7 @@ while True:
++     if line.startswith(expected_message):
++ 
++       
++-
+++   #prÃƒÂ¼fen ob die empfangene UART ist die erwartete Meldung.
++         if blink_test:
++ 
++             parts = line.split()
++@@ -141,7 +141,7 @@ while True:
++                 pass
++ 
++         else:
++-
+++    #test 4 all on
++             print("\n==============================")
++             print("Ã¢Å“â€¦ TEST BESTANDEN")
++             print("==============================")
++@@ -164,6 +164,7 @@ ser.close()
++ 
++ # -----------------------------
++ # Blinktest
+++#genÃƒÂ¼gend Zeitstempl vorhanden
++ # -----------------------------
++ if len(timestamps) < 2:
++ 
++@@ -178,11 +179,17 @@ if len(timestamps) < 2:
++ )
++     sys.exit()
++ 
+++
+++
++ print("\nGemessene Blinkzeiten:\n")
++ 
++ passed = True
+++
+++#liste fÃƒÂ¼r die Blinkintervalle
++ diffs = []
++ 
+++
+++#durchlÃƒÂ¤uft gespeicherte Zeitstempel
++ for i in range(len(timestamps)-1):
++ 
++     dt = timestamps[i+1] - timestamps[i]
+ 
+ 
+ ====================================================
+diff --git a/software/Taster_code/test_taster.py b/software/Taster_code/test_taster.py
+index 7732e15..36da874 100644
+--- a/software/Taster_code/test_taster.py
++++ b/software/Taster_code/test_taster.py
+@@ -5,7 +5,7 @@ import time
+ import inspect
+ 
+ 
+-print(">>> Neue professor_agent.py geladen <<<")
++
+ # AI-Agent importieren
+ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+ #war fÃ¼r den ersten Einsatz mit .py agent
+@@ -129,7 +129,7 @@ while True:
+     if line.startswith(expected_message):
+ 
+       
+-
++   #prÃ¼fen ob die empfangene UART ist die erwartete Meldung.
+         if blink_test:
+ 
+             parts = line.split()
+@@ -141,7 +141,7 @@ while True:
+                 pass
+ 
+         else:
+-
++    #test 4 all on
+             print("\n==============================")
+             print("âœ… TEST BESTANDEN")
+             print("==============================")
+@@ -164,6 +164,7 @@ ser.close()
+ 
+ # -----------------------------
+ # Blinktest
++#genÃ¼gend Zeitstempl vorhanden
+ # -----------------------------
+ if len(timestamps) < 2:
+ 
+@@ -178,11 +179,17 @@ if len(timestamps) < 2:
+ )
+     sys.exit()
+ 
++
++
+ print("\nGemessene Blinkzeiten:\n")
+ 
+ passed = True
++
++#liste fÃ¼r die Blinkintervalle
+ diffs = []
+ 
++
++#durchlÃ¤uft gespeicherte Zeitstempel
+ for i in range(len(timestamps)-1):
+ 
+     dt = timestamps[i+1] - timestamps[i]
 
 
 ====================================================

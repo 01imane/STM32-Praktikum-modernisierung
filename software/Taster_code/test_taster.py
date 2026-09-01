@@ -5,7 +5,7 @@ import time
 import inspect
 
 
-print(">>> Neue professor_agent.py geladen <<<")
+
 # AI-Agent importieren
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #war für den ersten Einsatz mit .py agent
@@ -129,7 +129,7 @@ while True:
     if line.startswith(expected_message):
 
       
-
+   #prüfen ob die empfangene UART ist die erwartete Meldung.
         if blink_test:
 
             parts = line.split()
@@ -141,7 +141,7 @@ while True:
                 pass
 
         else:
-
+    #test 4 all on
             print("\n==============================")
             print("✅ TEST BESTANDEN")
             print("==============================")
@@ -164,6 +164,7 @@ ser.close()
 
 # -----------------------------
 # Blinktest
+#genügend Zeitstempl vorhanden
 # -----------------------------
 if len(timestamps) < 2:
 
@@ -178,11 +179,17 @@ if len(timestamps) < 2:
 )
     sys.exit()
 
+
+
 print("\nGemessene Blinkzeiten:\n")
 
 passed = True
+
+#liste für die Blinkintervalle
 diffs = []
 
+
+#durchläuft gespeicherte Zeitstempel
 for i in range(len(timestamps)-1):
 
     dt = timestamps[i+1] - timestamps[i]

@@ -1,0 +1,19 @@
+## 1. Zusammenfassung
+
+Der Studierende Imane hat das Praktikum „Taster und LED-Ansteuerung" auf dem STM32 NUCLEO-F446RE erfolgreich umgesetzt. Der aktuelle Test (LED1 TOGGLE) ist **bestanden** mit einem gemessenen Wert von 1000,0 ms bei einem Sollwert von 1000 ms (±20 ms Toleranz). Alle 9 Requirements sind als implementiert markiert (100 % Abdeckung).
+
+**Sicherheit: hoch.** Das Testergebnis ist eindeutig positiv, die Messwerte sind konsistent (alle 9 Messungen exakt 1000 ms), und der Traceability Report bestätigt die vollständige Implementierung.
+
+---
+
+## 2. Bewertung der Requirements
+
+| Requirement | Bewertung | Begründung |
+|---|---|---|
+| GPIO_CONFIG | **erfüllt** | PA11–PA14 als Eingänge, PC0–PC3 als Ausgänge konfiguriert (Code: GPIOC->MODER = 0x55, GPIOA->MODER für PA11–PA14). Traceability: Implemented. |
+| T1_TIMING | **erfüllt** | TIM2 mit PSC=83999, ARR=999 ergibt 1 ms Tick → 1000 ms Periode. Test bestätigt: 1000,0 ms. |
+| T2_TIMING | **erfüllt** | Gleiche Timer-Konfiguration wie T1_TIMING. Testmessungen bestätigen 1000 ms. |
+| TASTER_1_FUNCTION | **erfüllt** | Taster PA11 löst LED1-Toggle (PC0) aus. Test: LED1 TOGGLE bestanden. |
+| TASTER_2_FUNCTION | **erfüllt** | Code implementiert: Taster PA12 → LED PC1 toggle. Traceability: Implemented. |
+| TASTER_3_FUNCTION | **erfüllt** | Code implementiert: Taster PA13 → alle LEDs toggeln. Traceability: Implemented. |
+| TASTER_4_FUNCTION | **erfüllt** | Code implementiert: Taster PA14 → alle LEDs an
