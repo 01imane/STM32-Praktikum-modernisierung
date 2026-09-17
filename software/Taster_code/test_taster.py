@@ -1,4 +1,6 @@
+#bib für uart-schnittstelle
 import serial
+
 import sys
 import os
 import time
@@ -6,25 +8,27 @@ import inspect
 
 
 
-# AI-Agent importieren
+#Den abs Pfad zu finden
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #war für den ersten Einsatz mit .py agent
 # from agent.ai_agent import analyze
 from agent_llm.student_agent import student_agent
 
 from agent_llm.professor_agent import professor_agent
-# -----------------------------
+
 # Einstellungen
-# -----------------------------
+
 PORT = "COM7"
 BAUDRATE = 115200
+
+#hier 1s als Anforderung 
 
 EXPECTED_TIME = 1000      # 1000 ms
 TOLERANCE = 20            # ±20 ms
 
-# -----------------------------
+
 # Test auswählen
-# -----------------------------
+
 print("Welchen Test möchten Sie durchführen?")
 print("1 - LED1 blinkt")
 print("2 - LED2 blinkt")
@@ -33,6 +37,7 @@ print("4 - Alle LEDs dauerhaft an")
 
 choice = input("Auswahl: ")
 
+#erwartete nachricht + ture ist blink test false ist dauerhaft an kein blink
 tests = {
     "1": ("LED1 TOGGLE", True),
     "2": ("LED2 TOGGLE", True),
@@ -44,7 +49,14 @@ if choice not in tests:
     print("Ungültige Auswahl.")
     sys.exit()
 
+# Bp bei Auswahl "1":
+# expected_message = "LED1 TOGGLE"
+# blink_test = True    
+
 expected_message, blink_test = tests[choice]
+
+
+#zuweisung jedes test mit Anförderungs_ID für KI später zu bestimmen welche Anforderung geprüft wird
 requirements = {
     "LED1 TOGGLE": "TASTER_1_FUNCTION",
     "LED2 TOGGLE": "TASTER_2_FUNCTION",
@@ -52,13 +64,19 @@ requirements = {
     "ALL ON": "TASTER_4_FUNCTION"
 }
 
+
+
+#test mit gehörtem Anforderung
 requirement = requirements[expected_message]
 
-# -----------------------------
+
 # UART öffnen
-# -----------------------------
+
 try:
     ser = serial.Serial(PORT, BAUDRATE, timeout=1)
+
+
+#wenn com nicht geöffnet
 except Exception as e:
 
     print("❌ COM-Port konnte nicht geöffnet werden.")
@@ -82,11 +100,13 @@ except Exception as e:
 
 print("\nStarte Test...\n")
 
+#für die gesendeten Zeitstemel
 timestamps = []
 
-
+#imeout-Überwachung
 start = time.time()
-TIMEOUT = 20      # Sekunden
+#max testdauer in s
+TIMEOUT = 20     
 
 # -----------------------------
 # UART lesen
@@ -112,12 +132,18 @@ while True:
         ser.close()
         sys.exit()
 
+
+#liest und wandelt bytes in text um ohne leerzeichen
     line = ser.readline().decode(errors="ignore").strip()
 
     if not line:
         continue
 
+
+#ausgabe in konsole
     print(line)
+
+
 
     # -----------------------------
     # Falscher Test?
@@ -132,8 +158,11 @@ while True:
    #prüfen ob die empfangene UART ist die erwartete Meldung.
         if blink_test:
 
+
+#eine liste ensteht ["LED1", "TOGGLE", "5000"]
             parts = line.split()
 
+#die letzte stelle ansprechen -1 und speichern in liste
             try:
                 timestamp = int(parts[-1])
                 timestamps.append(timestamp)
@@ -162,10 +191,10 @@ while True:
 
 ser.close()
 
-# -----------------------------
+
 # Blinktest
 #genügend Zeitstempl vorhanden
-# -----------------------------
+
 if len(timestamps) < 2:
 
     print("\n❌ Zu wenige Blinkereignisse erkannt.")
@@ -185,7 +214,7 @@ print("\nGemessene Blinkzeiten:\n")
 
 passed = True
 
-#liste für die Blinkintervalle
+#liste für die Blinkintervalle 
 diffs = []
 
 
@@ -195,6 +224,8 @@ for i in range(len(timestamps)-1):
     dt = timestamps[i+1] - timestamps[i]
     diffs.append(dt)
 
+
+# Gibt die Nummer und Dauer des Intervalls
     print(f"{i+1}. {dt} ms")
 
     
@@ -275,4 +306,6 @@ Toleranz:
 ±{TOLERANCE} ms
 """
 )
+
+#zum testen welche parameter die Fun erwartet, nicht benötigt
 print(inspect.signature(professor_agent))

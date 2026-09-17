@@ -13,7 +13,7 @@ def student_agent(
     uart_output
 ):
 
-    # SysML-Modelle laden
+    # SysML-Modelle laden Vorlesungsmodell und Praktikum
     lecture, practical = load_models()
 
     # Gemeinsamen Kontext laden
@@ -23,19 +23,25 @@ def student_agent(
     prompt = build_prompt(
 
         test_name=test_name,
+
+#zum Beispiel 1000 ms.        
         expected=expected,
+
+
         average=average,
         tolerance=tolerance,
-        requirement=requirement,
 
+#ID der geprüften SysML-Anforderung,        
+        requirement=requirement,
+# Inhalt des Vorlesungsmodells.
         lecture_model=lecture,
         practical_model=practical,
 
-
+# Beschreibung der verwendeten Hardware.
         hardware=context["hardware"],
         c_code=context["c_code"],
         traceability=context["traceability"],
-
+#Messwerten
         uart_output=uart_output
 
     )
@@ -46,7 +52,7 @@ def student_agent(
     print("\n========== AI FEEDBACK ==========\n")
     print(answer)
     print("\n===============================\n")
-
+# KI-Antwort in einer Textdatei speichern
     with open("student_feedback.txt", "a", encoding="utf-8") as f:
          f.write(answer)
 

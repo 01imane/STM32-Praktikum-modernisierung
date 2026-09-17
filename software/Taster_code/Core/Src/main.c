@@ -143,7 +143,7 @@ TIM5->CR1 = 1;
 
 // 84 MHz und 1s
 TIM2->PSC = 84000 - 1;
-TIM2->ARR = 1000-1 ;   // 0,5 s  autoreload
+TIM2->ARR = 1000-1 ;   // 1 s  autoreload
 
 TIM2->EGR = 1;          // Werte sofort übernehmen
 TIM2->SR = 0;           // Flags löschen

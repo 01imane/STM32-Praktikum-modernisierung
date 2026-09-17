@@ -1,3 +1,6 @@
+
+#sammelt Informationen aus dem Git-Repository und formatiert sie als Text.
+
 from .git_reader import (
     get_branch,
     get_commit_count,

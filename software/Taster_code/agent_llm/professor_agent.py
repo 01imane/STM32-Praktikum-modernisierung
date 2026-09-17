@@ -1,3 +1,7 @@
+#Der professor_agent ist die Orchestrierungsfunktion für die lehrendenseitige Bewertung. 
+# Er sammelt Testdaten, SysML-Modelle, C-Code, Hardwarebeschreibung, Traceability und Git-Informationen,
+#  baut daraus einen Professor-Prompt und sendet ihn an dasselbe LLM.
+
 from .sysml_reader import load_models
 from .prof_prompts import build_prof_prompt
 from .llm_client import ask_llm

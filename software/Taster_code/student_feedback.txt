@@ -16,4 +16,69 @@ Der Test wurde bestanden, da die gemessenen Umschaltzeiten (1000 ms ± 0 ms) inn
 - Überprüfe die Timer-Peripherie (TIM2) auf die korrekte PSC-/ARR-Einstellung.
 - Stelle sicher, dass der Taster-Pull-Up und die Active-Low-Logik korrekt sind.
 - Überprüfe den Interrupt-Service-Routine-Code für den Modus 1.
-- Vergleiche die UART-Timestamps mit dem erwarteten periodischen Verhalten.
+- Vergleiche die UART-Timestamps mit dem erwarteten periodischen Verhalten.## 1. Testergebnis
+
+- **Bestanden**
+- Betroffenes Requirement: **TASTER_4_FUNCTION**
+
+----------------------------------------------------
+
+## 2. Interpretation
+
+Der Test wurde bestanden, da Sollwert und gemessener Mittelwert jeweils **0 ms** betragen und die Toleranz **±0 ms** beträgt. Die UART-Ausgabe **„ALL ON“** bestätigt die erwartete Testausgabe. Requirement und SysML fordern bei gedrücktem Taster **PA14**, dass alle LEDs dauerhaft eingeschaltet werden. Der Code setzt im Modus 4 alle LEDs auf ON und gibt „ALL ON“ aus. Die Traceability zeigt das Requirement als implementiert. Es liegen keine widersprüchlichen Informationen vor; eine unabhängige Prüfung der physischen LEDs ist jedoch nicht dokumentiert.
+
+----------------------------------------------------
+
+## 3. Hinweise
+
+- Prüfe, ob der Test den Taster PA14 tatsächlich aktiviert.
+- Vergleiche die UART-Ausgabe mit dem geforderten LED-Zustand.
+- Wiederhole Active-Low-Eingänge und dauerhaften LED-Betrieb.
+- Prüfe die Traceability zwischen Requirement und Implementierung.## 1. Testergebnis
+
+- **Bestanden**
+- Betroffenes Requirement: **TASTER_2_FUNCTION**
+
+----------------------------------------------------
+
+## 2. Interpretation
+
+Der Test ist bestanden: 9 Messwerte liegen exakt bei 1000 ms, der Mittelwert beträgt 1000.0 ms – innerhalb der Toleranz ±20 ms. Die UART-Ausgabe bestätigt periodisches "LED2 TOGGLE". Das Requirement TASTER_2_FUNCTION (Taster PA12 → LED PC1 blinkt) ist implementiert und traceability-technisch zu 100 % abgedeckt. Timer TIM2 ist mit PSC=83999 und ARR=999 konfiguriert, was bei 84 MHz eine 1-s-Periode ergibt. SysML-Modelle und Code sind konsistent. Da der Test erfolgreich war, liegt kein Fehler vor.
+
+----------------------------------------------------
+
+## 3. Hinweise
+
+- Vergleiche SysML-Modell und Code auf Konsistenz der Tasterzuordnung PA12/PC1.
+- Prüfe, ob TIM2 und TIM5 korrekt arbeiten (1 Hz vs. 1 ms).
+- Wiederhole die Vorlesung zur Timer-Registerprogrammierung.
+- Überprüfe die Traceability bei weiteren Requirements.## 1. Testergebnis
+- Bestanden  
+- Betroffenes Requirement: **T1_TIMING** (LED1 periodisch mit 1000 ms Umschaltzeit)
+
+## 2. Interpretation
+Der UART‑Auszug gibt „LED1 TOGGLE …“ und einen Durchschnitt von 1000 ms an, was exakt die geforderte Umschaltzeit bedeutet. Im Code wird TIM2 mit PSC = 84000‑1 und ARR = 1000‑1 konfiguriert; dieser Timer erzeugt ein Update‑Event (SR‑Bit = 1) in einem Intervall von 1 s, das im While‑Loop abgefragt und zur LED‑Umschaltung verwendet wird. Damit ist das Requirement T1_TIMING erfüllt – das gemessene Intervall entspricht der Sollwert‑Vorstellung, es gibt keinen Widerspruch zwischen Messwert und Anforderung.
+
+## 3. Hinweise
+- Prüfe, ob TIM2 tatsächlich das erwartete 1 s‑Intervall erzeugt.  
+- Vergleiche die Timer‑Quelle (TIM2) mit der im Test gemessenen Periode.  
+- Achte darauf, dass das Update‑Flag (SR‑Bit) zuverlässig gesetzt wird.  
+- Wiederhole die Vorlesung zum Timer‑Grundlagen‑Konzept.## 1. Testergebnis
+
+- Bestanden  
+- Betroffenes Requirement: **TASTER_1_FUNCTION** (Wird Taster PA11 gedrückt, blinkt LED PC0)
+
+----------------------------------------------------
+
+## 2. Interpretation
+
+Der Test ist bestanden, weil die gemessenen Umschaltzeiten der LED1 exakt dem Sollwert von 1000 ms entsprechen und innerhalb der Toleranz liegen. Die UART‑Ausgabe zeigt bei jedem Toggle die aktuelle Zählerstand von TIM5, was bestätigt, dass der Timer‑Interrupt periodisch ausgelöst wird und die LED im Modus 1 umgeschaltet wird. Damit wird sowohl das funktionale Requirement TASTER_1_FUNCTION als auch das zeitliche Requirement T1_TIMING erfüllt. Da kein Fehler vorliegt, kann die Ursache des Ergebnisses nicht als Problem angesehen werden.
+
+----------------------------------------------------
+
+## 3. Hinweise
+
+- Prüfe, ob TIM2 mit dem korrekten Prescaler und ARR für 1 s konfiguriert ist.  
+- Stelle sicher, dass der Modus‑Wechsel über die Taster korrekt erkannt wird (Active‑Low, Pull‑Up).  
+- Achte darauf, dass beim Wechsel zwischen den Modi keine unbeabsichtigten LED‑Zustände zurückbleiben.  
+- Wiederhole die Vorlesung zur Timer‑basierten Periodenerzeugung und zum Debouncing von Tastern.
